@@ -44,7 +44,7 @@
   #float-numbers{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
   #float-numbers .fn{
     position:absolute;bottom:-60px;font-weight:700;font-family:'Roboto',Arial,sans-serif;
-    opacity:.16;will-change:transform;user-select:none;
+    opacity:.07;will-change:transform;user-select:none;
   }
   #float-numbers .fn.sm{font-size:26px;}
   #float-numbers .fn.md{font-size:48px;}
@@ -109,7 +109,7 @@
     min-height:150px;display:flex;flex-direction:column;justify-content:flex-end;
     background:linear-gradient(125deg,#1a73e8 0%,#8e44ad 26%,#d93025 50%,#f9ab00 74%,#1e8e3e 100%);
     background-size:320% 320%;
-    animation:heroFlow 14s ease infinite;
+    animation:heroFlow 22s ease infinite;
     box-shadow:0 12px 28px rgba(60,64,67,.30),
                inset 0 2px 0 rgba(255,255,255,.40),
                inset 0 -12px 30px rgba(0,0,0,.22);
@@ -117,28 +117,21 @@
   @keyframes heroFlow{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
   /* kilau/gloss 3D di atas */
   .hero-inner::before{content:"";position:absolute;left:0;right:0;top:0;height:45%;
-    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0));pointer-events:none;}
-  /* angka bergelombang */
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0));pointer-events:none;}
+  /* scrim gelap di bawah agar teks selalu terbaca (kontras) */
+  .hero-inner::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70%;
+    background:linear-gradient(0deg,rgba(0,0,0,.28),transparent);pointer-events:none;}
+  /* angka statis lembut (tidak bergerak) */
   .hero-nums{position:absolute;right:26px;top:50%;transform:translateY(-50%);display:flex;gap:16px;pointer-events:none;z-index:1;}
   .hero-nums span{
-    font-size:44px;font-weight:800;color:rgba(255,255,255,.42);display:inline-block;
-    text-shadow:0 4px 10px rgba(0,0,0,.18);animation:numWave 2.4s ease-in-out infinite;
+    font-size:44px;font-weight:800;color:rgba(255,255,255,.30);display:inline-block;
+    text-shadow:0 4px 10px rgba(0,0,0,.18);
   }
-  .hero-nums span:nth-child(1){animation-delay:0s;}
-  .hero-nums span:nth-child(2){animation-delay:.2s;}
-  .hero-nums span:nth-child(3){animation-delay:.4s;}
-  .hero-nums span:nth-child(4){animation-delay:.6s;}
-  @keyframes numWave{0%,100%{transform:translateY(0);}50%{transform:translateY(-18px);}}
   .hero h1{
     font-size:32px;font-weight:800;margin:0 0 4px;position:relative;z-index:1;
-    color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.28);
-    animation:titleColors 8s linear infinite;
+    color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.45);
   }
-  @keyframes titleColors{
-    0%{color:#ffffff;}20%{color:#ffe082;}40%{color:#a5d6ff;}
-    60%{color:#b9f6ca;}80%{color:#ffd1dc;}100%{color:#ffffff;}
-  }
-  .hero .subtitle{font-size:15px;color:rgba(255,255,255,.95);margin:0;position:relative;z-index:1;text-shadow:0 1px 4px rgba(0,0,0,.25);}
+  .hero .subtitle{font-size:15px;color:#fff;margin:0;position:relative;z-index:1;text-shadow:0 1px 6px rgba(0,0,0,.4);}
   @media (prefers-reduced-motion: reduce){
     .hero-inner,.hero h1,.hero-nums span{animation:none !important;}
     .hero h1{color:#fff;}
@@ -178,7 +171,7 @@
   .card-toolbar button{
     min-height:40px;padding:8px 15px;font-size:13.5px;font-weight:800;border-radius:12px;
     border:1px solid #ffd9a3;cursor:pointer;
-    color:#e8710a;                       /* tulisan oranye */
+    color:#9a4a00;                       /* oranye lebih gelap — kontras lebih baik */
     background:linear-gradient(180deg,#ffffff 0%,#fff3e0 100%);
     box-shadow:0 4px 0 #f2b877, 0 6px 10px rgba(232,113,10,.18);  /* efek kolom 3D */
     transform:translateY(0);transition:transform .08s ease, box-shadow .08s ease, background .15s ease;
@@ -443,12 +436,18 @@
   @keyframes badgePop{0%{transform:scale(.5);}55%{transform:scale(1.2);}100%{transform:scale(1);}}
 
   /* ====== LATIHAN ====== */
+  .pengayaan-tag{display:inline-block;background:#fef7e0;color:#8a5a00;border:1px solid #fde293;border-radius:20px;padding:5px 12px;font-size:13px !important;font-weight:800;margin:0 0 8px !important;}
+  /* Teks materi diperbesar & diberi jarak agar mudah dibaca anak SD */
+  .materi-read p{font-size:16px !important;line-height:1.75 !important;margin:7px 0 !important;}
+  .materi-read li{font-size:16px !important;line-height:1.7 !important;margin-bottom:5px !important;}
+  .materi-read .seq{font-size:19px !important;padding:6px 14px !important;}
+  .materi-read .ans{font-size:15px !important;}
   .lat-group{background:#fafbff;border:1px solid #e3e6ea;border-radius:12px;padding:12px 14px;margin-bottom:14px;}
   .lat-title{font-size:15px;font-weight:800;color:var(--blue-dark);margin:0 0 6px;}
   .lat-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #f1f3f4;flex-wrap:nowrap;}
   .lat-no{font-size:13px;color:var(--muted);flex-shrink:0;width:20px;font-weight:700;}
   .lat-pola{font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  input.lat-input{width:44px !important;flex-shrink:0;padding:8px 2px !important;font-size:15px;text-align:center;font-weight:700;border-radius:4px;border:1px solid var(--border);margin:0 !important;background:var(--surface);color:var(--text);}
+  input.lat-input{width:48px !important;min-height:44px;flex-shrink:0;padding:10px 2px !important;font-size:16px;text-align:center;font-weight:700;border-radius:8px;border:1.5px solid var(--border);margin:0 !important;background:var(--surface);color:var(--text);}
   input.lat-input.lat-correct{border-color:var(--green);background:var(--green-bg);color:var(--green-text);}
   input.lat-input.lat-wrong{border-color:var(--red);background:var(--red-bg);color:var(--red);}
 
@@ -884,6 +883,7 @@ const materiSlides = [
       <p style="font-size:13px;margin:0 0 2px"><b>Kelipatan 3:</b> 3, 6, 9, 12, 15, 18, ...</p>
       <p style="font-size:13px;margin:0"><b>Kelipatan 5:</b> 5, 10, 15, 20, 25, 30, ...</p>`},
   { title: "Penjumlahan tidak tetap", body: () => `
+      <p class="pengayaan-tag">⭐ Materi Pengayaan — tantangan tambahan, tidak wajib untuk semua siswa.</p>
       <p style="font-size:13px;margin:0 0 4px">Tidak semua pola bertambah dengan angka yang sama.</p>${seq("1, 2, 4, 7, 11, 16, ...")}
       ${steps(["1 → 2 = +1","2 → 4 = +2","4 → 7 = +3","7 → 11 = +4","11 → 16 = +5"])}
       <p style="font-size:13px;margin:0">Penambahannya +1, +2, +3, +4, +5, ... Berikutnya 16 + 6 = 22.</p>`},
@@ -951,7 +951,7 @@ function renderMateriTeks(){
   return `
     <p style="font-size:13px;color:var(--muted);margin:0 0 8px">Teks terstruktur — bagian ${idx+1} dari ${total}</p>
     <div class="materi-dots">${materiSlides.map((s,i)=>`<span class="materi-dot${i===idx?' on':''}"></span>`).join('')}</div>
-    <div class="box"><p style="margin:0 0 8px;font-size:15px;font-weight:700;color:var(--text)">${idx+1}. ${slide.title}</p>${slide.body()}</div>
+    <div class="box materi-read"><p style="margin:0 0 8px;font-size:18px;font-weight:800;color:var(--text)">${idx+1}. ${slide.title}</p>${slide.body()}</div>
     <div class="materi-nav">
       <button id="materi-prev" ${idx===0?'disabled':''}>‹ Halaman sebelumnya</button>
       <span class="materi-counter">Halaman ${idx+1} / ${total}</span>
@@ -1478,7 +1478,7 @@ const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-mo
   const digits = ['2','4','6','8','3','5','7','9','1','10','12','+2','−3'];
   const sizes = ['sm','md','lg'];
   const colors = ['c1','c2','c3','c4','c5'];
-  const COUNT = 22;
+  const COUNT = 9;
   for(let i=0;i<COUNT;i++){
     const el = document.createElement('span');
     const size = sizes[Math.floor(Math.random()*sizes.length)];
@@ -1486,7 +1486,7 @@ const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-mo
     el.textContent = digits[Math.floor(Math.random()*digits.length)];
     el.style.left = (Math.random()*98)+'vw';
     // kecepatan beragam: 14–34 detik
-    const dur = 14 + Math.random()*20;
+    const dur = 24 + Math.random()*22;
     const delay = -Math.random()*dur; // mulai tersebar, tidak menumpuk
     el.style.animationName = Math.random()>0.5 ? 'floatRise' : 'floatRiseAlt';
     el.style.animationDuration = dur.toFixed(1)+'s';
