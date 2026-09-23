@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pola Bilangan — LMS Matematika SD</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a73e8">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pola Bilangan">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -82,18 +89,55 @@
   .name-chip:hover{background:#d6e4fd;}
   .name-chip:active{transform:scale(.96);}
   .name-chip #name-label{max-width:120px;overflow:hidden;text-overflow:ellipsis;}
+  .keluar-chip{
+    font-size:13px;font-weight:700;color:var(--red);background:var(--red-bg);
+    border:1px solid #f6c6c1;padding:6px 13px;border-radius:20px;cursor:pointer;white-space:nowrap;
+    display:inline-flex;align-items:center;gap:5px;transition:background .15s ease,transform .1s ease;
+  }
+  .keluar-chip:hover{background:#fad4d0;}
+  .keluar-chip:active{transform:scale(.96);}
 
   /* ====== HERO / BANNER KELAS ====== */
   .hero{max-width:1040px;margin:20px auto 0;padding:0 20px;}
   .hero-inner{
-    position:relative;overflow:hidden;border-radius:12px;padding:28px 30px;
-    background:linear-gradient(120deg,#1a73e8 0%,#4285f4 55%,#5e97f6 100%);
-    box-shadow:var(--shadow-1);min-height:150px;display:flex;flex-direction:column;justify-content:flex-end;
+    position:relative;overflow:hidden;border-radius:20px;padding:30px 32px;
+    min-height:150px;display:flex;flex-direction:column;justify-content:flex-end;
+    background:linear-gradient(125deg,#1a73e8 0%,#8e44ad 26%,#d93025 50%,#f9ab00 74%,#1e8e3e 100%);
+    background-size:320% 320%;
+    animation:heroFlow 14s ease infinite;
+    box-shadow:0 12px 28px rgba(60,64,67,.30),
+               inset 0 2px 0 rgba(255,255,255,.40),
+               inset 0 -12px 30px rgba(0,0,0,.22);
   }
-  .hero-inner::before{content:"";position:absolute;right:-40px;top:-40px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.10);}
-  .hero-inner::after{content:"2  4  6  8";position:absolute;right:24px;top:18px;font-size:34px;font-weight:700;color:rgba(255,255,255,.18);letter-spacing:6px;pointer-events:none;}
-  .hero h1{font-size:30px;font-weight:700;margin:0 0 4px;color:#fff;position:relative;}
-  .hero .subtitle{font-size:15px;color:rgba(255,255,255,.92);margin:0;position:relative;}
+  @keyframes heroFlow{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+  /* kilau/gloss 3D di atas */
+  .hero-inner::before{content:"";position:absolute;left:0;right:0;top:0;height:45%;
+    background:linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,0));pointer-events:none;}
+  /* angka bergelombang */
+  .hero-nums{position:absolute;right:26px;top:50%;transform:translateY(-50%);display:flex;gap:16px;pointer-events:none;z-index:1;}
+  .hero-nums span{
+    font-size:44px;font-weight:800;color:rgba(255,255,255,.42);display:inline-block;
+    text-shadow:0 4px 10px rgba(0,0,0,.18);animation:numWave 2.4s ease-in-out infinite;
+  }
+  .hero-nums span:nth-child(1){animation-delay:0s;}
+  .hero-nums span:nth-child(2){animation-delay:.2s;}
+  .hero-nums span:nth-child(3){animation-delay:.4s;}
+  .hero-nums span:nth-child(4){animation-delay:.6s;}
+  @keyframes numWave{0%,100%{transform:translateY(0);}50%{transform:translateY(-18px);}}
+  .hero h1{
+    font-size:32px;font-weight:800;margin:0 0 4px;position:relative;z-index:1;
+    color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.28);
+    animation:titleColors 8s linear infinite;
+  }
+  @keyframes titleColors{
+    0%{color:#ffffff;}20%{color:#ffe082;}40%{color:#a5d6ff;}
+    60%{color:#b9f6ca;}80%{color:#ffd1dc;}100%{color:#ffffff;}
+  }
+  .hero .subtitle{font-size:15px;color:rgba(255,255,255,.95);margin:0;position:relative;z-index:1;text-shadow:0 1px 4px rgba(0,0,0,.25);}
+  @media (prefers-reduced-motion: reduce){
+    .hero-inner,.hero h1,.hero-nums span{animation:none !important;}
+    .hero h1{color:#fff;}
+  }
 
   /* ====== LAYOUT ====== */
   .layout{max-width:1040px;margin:20px auto;padding:0 20px;display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start;}
@@ -115,6 +159,7 @@
   .nav-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .nav-check{width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:700;border-radius:50%;}
   .nav-item.done .nav-check{background:var(--green);}
+  .nav-item.locked .nav-check{background:transparent;color:inherit;}
 
   /* ====== KARTU UTAMA ====== */
   .main{min-width:0;}
@@ -124,13 +169,22 @@
   .content-card{padding:0;overflow:hidden;}
 
   /* ====== TOOLBAR UTILITAS ====== */
-  .card-toolbar{display:flex;gap:6px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--border);background:#fafafa;}
+  .card-toolbar{display:flex;gap:9px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border);background:#fffaf2;}
   .card-toolbar button{
-    min-height:34px;padding:5px 12px;font-size:13px;font-weight:500;border-radius:18px;
-    border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--muted);transition:all .12s ease;
+    min-height:40px;padding:8px 15px;font-size:13.5px;font-weight:800;border-radius:12px;
+    border:1px solid #ffd9a3;cursor:pointer;
+    color:#e8710a;                       /* tulisan oranye */
+    background:linear-gradient(180deg,#ffffff 0%,#fff3e0 100%);
+    box-shadow:0 4px 0 #f2b877, 0 6px 10px rgba(232,113,10,.18);  /* efek kolom 3D */
+    transform:translateY(0);transition:transform .08s ease, box-shadow .08s ease, background .15s ease;
   }
-  .card-toolbar button:hover{background:#f1f3f4;color:var(--text);}
-  .card-toolbar button.on{background:var(--blue);color:#fff;border-color:var(--blue);}
+  .card-toolbar button:hover{background:linear-gradient(180deg,#ffffff 0%,#ffe9cc 100%);}
+  .card-toolbar button:active{transform:translateY(4px);box-shadow:0 0 0 #f2b877, 0 2px 5px rgba(232,113,10,.2);}
+  .card-toolbar button.on{
+    color:#fff;background:linear-gradient(180deg,#fbb040 0%,#f9821a 100%);
+    border-color:#e8710a;box-shadow:0 4px 0 #c85e00, 0 6px 10px rgba(232,113,10,.3);
+  }
+  @media (prefers-reduced-motion: reduce){.card-toolbar button{transition:none;}}
 
   /* ====== TIPS PEMANDU ====== */
   #mascot{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--blue-bg);border-bottom:1px solid var(--border);}
@@ -341,6 +395,20 @@
   .unduh-btn.pdf{background:linear-gradient(120deg,#d93025,#f9ab00);}
   .unduh-btn.vid{background:linear-gradient(120deg,#1e8e3e,#1a73e8);}
   .unduh-note{font-size:12px;color:var(--muted);margin:10px 0 0;}
+  /* Menu unduh (2 pilihan) */
+  .unduh-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;}
+  .unduh-sheet{background:#fff;border-radius:18px;padding:22px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3);animation:gateIn .25s ease;}
+  .um-title{font-size:18px;font-weight:800;color:var(--blue-dark);margin:0 0 2px;}
+  .um-sub{font-size:13px;color:var(--muted);margin:0 0 16px;}
+  .unduh-sheet .unduh-btn{display:block;margin:10px 0;text-decoration:none;}
+  .um-cancel{margin-top:10px;background:none;border:1px solid var(--border);color:var(--muted);padding:9px;border-radius:10px;width:100%;cursor:pointer;font-size:13px;font-weight:700;}
+  /* Panel terkunci */
+  .locked-box{text-align:center;padding:30px 18px;}
+  .locked-box .locked-ico{font-size:52px;margin-bottom:8px;}
+  .locked-box h2{font-size:19px;color:var(--text);margin:0 0 8px;}
+  .locked-box p{font-size:14px;color:var(--muted);margin:0 auto 18px;max-width:420px;}
+  /* Tab terkunci */
+  .nav-item.locked{opacity:.6;}
   .terkirim-note{
     display:flex;gap:8px;align-items:flex-start;text-align:left;
     background:var(--green-bg);border:1px solid #a8d5b5;border-radius:12px;
@@ -427,9 +495,10 @@
     .nav-ico{font-size:20px;}
     .nav-txt{white-space:normal;font-size:11px;line-height:1.25;}
     .nav-check{position:absolute;top:5px;right:9px;width:16px;height:16px;font-size:10px;}
-    .nav-item:not(.done) .nav-check{display:none;}
+    .nav-item:not(.done):not(.locked) .nav-check{display:none;}
     .hero-inner{padding:22px 20px;min-height:118px;}
-    .hero-inner::after{display:none;}
+    .hero-nums{right:14px;gap:9px;}
+    .hero-nums span{font-size:28px;}
     .hero h1{font-size:24px;}
     .card-grid{grid-template-columns:1fr;}
   }
@@ -444,9 +513,11 @@
     .hero-inner{padding:20px 16px;min-height:100px;}
     .hero h1{font-size:22px;}
     .hero .subtitle{font-size:13px;}
+    .hero-nums span{font-size:22px;}
+    .hero-nums{right:10px;gap:7px;opacity:.85;}
     .screen-body{padding:16px;min-height:320px;}
-    .card-toolbar{padding:8px 10px;gap:5px;}
-    .card-toolbar button{padding:7px 11px;font-size:12px;min-height:38px;}
+    .card-toolbar{padding:10px 10px;gap:8px;}
+    .card-toolbar button{padding:8px 12px;font-size:12.5px;min-height:40px;}
     #mascot{padding:10px 12px;}
     .nav-buttons{padding:12px 14px;gap:8px;}
     .nav-buttons button{flex:1;padding:11px 10px;}
@@ -475,7 +546,7 @@
         <button class="btn-primary" id="start-btn">Masuk kelas ✨</button>
         <div class="gate-note">
           <span style="font-size:16px;line-height:1">📱</span>
-          <span>Memakai <b>ponsel teman</b>? Ketik namamu sendiri dulu. Nama bisa <b>diganti kapan saja</b> lewat tombol nama di pojok atas layar.</span>
+          <span>Memakai <b>ponsel teman</b>? Ketik namamu sendiri dulu. Setelah selesai, tekan tombol <b>🚪 Keluar</b> di pojok atas agar teman bisa masuk dengan namanya sendiri.</span>
         </div>
       </div>
     </div>
@@ -488,13 +559,14 @@
         <span class="appbar-title">Pola Bilangan</span>
       </div>
       <div class="appbar-right">
-        <button id="ganti-nama" class="name-chip" title="Ganti nama — berguna jika memakai ponsel teman">👤 <span id="name-label">Nama</span> · ganti</button>
+        <button id="keluar-btn" class="keluar-chip" title="Keluar dari kelas">🚪 Keluar</button>
         <span class="counter" id="screen-counter">Layar 1 / 8</span>
       </div>
     </div>
 
     <div class="hero">
       <div class="hero-inner">
+        <div class="hero-nums" aria-hidden="true"><span>2</span><span>4</span><span>6</span><span>8</span></div>
         <h1>Pola Bilangan</h1>
         <p class="subtitle">Unit Pembelajaran Matematika SD · Berbasis Desain Inklusif &amp; Aksesibilitas</p>
       </div>
@@ -514,7 +586,6 @@
             <button id="a-minus" aria-label="Perkecil ukuran teks">A−</button>
             <button id="a-plus" aria-label="Perbesar ukuran teks">A+</button>
             <button id="tts-btn">🔊 Bacakan</button>
-            <button id="lang-btn">🌐 Bahasa daerah</button>
             <button id="data-saver-btn">📶 Hemat data</button>
             <button id="download-btn">⬇ Unduh materi</button>
           </div>
@@ -559,7 +630,7 @@ const MATERI_VIDEO_ID = "rND9pHRtTwo";
    bila belum ada. Pastikan berbagi file disetel: "Anyone with the link" → Viewer,
    agar siswa bisa mengunduh tanpa harus minta izin. */
 const MATERI_PDF_LINK   = "https://drive.google.com/file/d/1Om2Z9Cw11FLCVv6CXWm6D3oHaMJLBzet/view?usp=sharing";
-const MATERI_VIDEO_LINK = "";   // ← isi link VIDEO Drive di sini (link yang dikirim tadi masih sama dengan PDF)
+const MATERI_VIDEO_LINK = "https://drive.google.com/file/d/114zbbyKSJIfESOdEbSjvTAfSJxO-D77-/view?usp=sharing";
 
 // Ubah link "share" Drive menjadi tautan unduh langsung
 function driveDownloadURL(url){
@@ -577,7 +648,7 @@ let materiMode = localStorage.getItem('lms_materi_mode') || 'teks';
 let quizIdx = parseInt(localStorage.getItem('lms_quiz_idx') || '0', 10) || 0;
 let aktMode = localStorage.getItem('lms_akt_mode') || 'angka';
 let asMode = localStorage.getItem('lms_as_mode') || 'tertulis';
-let localeDaerah = localStorage.getItem('lms_lang') === 'daerah';
+let localeDaerah = false;  /* Bahasa daerah dinonaktifkan — selalu Bahasa Indonesia */
 
 const quiz = [
   { q: "Lengkapi pola: 2, 4, 6, 8, __", options: ["9","10","12","16"], correct: 1, ket:"Bertambah 2, jadi 8 + 2 = 10." },
@@ -612,18 +683,14 @@ document.getElementById('start-btn').addEventListener('click', ()=>{
 nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('start-btn').click(); });
 
 /* Ganti nama — berguna bila memakai ponsel teman */
-const gantiNamaBtn = document.getElementById('ganti-nama');
-if(gantiNamaBtn){
-  gantiNamaBtn.addEventListener('click', ()=>{
-    const v = prompt('Tulis nama peserta (bisa diganti bila memakai ponsel teman):', studentName || '');
-    if(v===null) return;
-    const nama = v.trim();
-    if(!nama) return;
-    studentName = nama;
-    localStorage.setItem('lms_student_name', studentName);
-    updateNameLabel();
-    render(current);
-    showToast('Nama diganti menjadi ' + studentName);
+/* Keluar dari kelas — kosongkan sesi & progres agar siswa berikutnya mulai bersih */
+const keluarBtn = document.getElementById('keluar-btn');
+if(keluarBtn){
+  keluarBtn.addEventListener('click', ()=>{
+    const ok = confirm('Keluar dari kelas?\n\nProgres di perangkat ini akan dikosongkan agar siswa berikutnya bisa mulai dari awal. Pastikan hasil belajar sudah dikirim/diekspor ke guru.');
+    if(!ok) return;
+    Object.keys(localStorage).filter(k=>k.indexOf('lms_')===0).forEach(k=>localStorage.removeItem(k));
+    location.reload();
   });
 }
 
@@ -923,12 +990,37 @@ function renderMateriVideo(){
 }
 
 function screenDone(idx){
+  if(idx<=2) return !!(answers.seen && answers.seen[idx]);   // Beranda, Petunjuk, Tujuan (sudah dibaca)
   if(idx===3) return !!answers.materiDone;
   if(idx===4) return !!(answers.aktivitas || answers.aktivitas2);
   if(idx===5) return !!answers.diskusi;
   if(idx===6) return !!answers.quizDone;
   if(idx===7) return !!answers.submitted;
   return false;
+}
+/* Asesmen (6) & Refleksi (7) hanya bisa dikerjakan secara berurutan */
+function canAccess(idx){
+  if(idx===6) return [0,1,2,3,4,5].every(screenDone);   // wajib selesai semua tahap belajar dulu
+  if(idx===7) return screenDone(6);                     // Refleksi butuh Asesmen selesai
+  return true;
+}
+function firstIncomplete(list){ for(const k of list){ if(!screenDone(k)) return k; } return list[0]; }
+function lockedHTML(idx){
+  if(idx===6){
+    const go = firstIncomplete([0,1,2,3,4,5]);
+    return `<div class="locked-box">
+      <div class="locked-ico">🔒</div>
+      <h2>Asesmen masih terkunci</h2>
+      <p>Selesaikan dulu semua tahap belajar secara berurutan: <b>Beranda → Petunjuk → Tujuan → Materi → Aktivitas → Diskusi</b>.</p>
+      <button class="btn-primary" id="locked-go" data-goto="${go}">Lanjut ke ${escapeHtml(screens[go].title)} →</button>
+    </div>`;
+  }
+  return `<div class="locked-box">
+    <div class="locked-ico">🔒</div>
+    <h2>Refleksi masih terkunci</h2>
+    <p>Kerjakan dan kirim dulu <b>Asesmen</b>, baru Refleksi bisa dibuka.</p>
+    <button class="btn-primary" id="locked-go" data-goto="6">Ke Asesmen →</button>
+  </div>`;
 }
 function resumeTarget(){
   if(!answers.materiDone) return 3;
@@ -1246,10 +1338,12 @@ function renderRefleksi(){
   html += modalityHTML('refl');
   const qs = ["Pola apa yang paling mudah kamu pahami?","Bagian mana yang masih membingungkan?","Di mana kamu menemukan pola di lingkungan sekitarmu?"];
   html += qs.map((q,i)=>`<p style="font-size:13px;margin:10px 0 4px">${i+1}. ${q}</p><textarea class="refleksi-input" data-idx="${i}" placeholder="Tulis / rekam jawabanmu…">${escapeHtml((answers.refleksi||[])[i] || '')}</textarea>`).join('');
-  html += `<button class="btn-primary" id="submit-final">✓ Kirim Refleksi</button>`;
-  html += `<p class="status-msg" id="final-status">${answers.submitted ? '✓ Hasil belajar sudah terkirim. Terima kasih!' : ''}</p>`;
-  html += `<button id="export-btn" style="width:100%;padding:9px;font-size:14px;border-radius:4px;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--blue);margin-top:10px">⬇ Ekspor hasil belajar (kirim manual ke guru)</button>`;
-  html += `<p style="font-size:12px;color:var(--muted);margin:8px 0 0">Gunakan ini kalau tidak ada internet. File hasil bisa dikirim lewat WhatsApp atau email ke guru.</p>`;
+  html += `<button class="btn-2" id="save-refl" style="width:100%">✓ Simpan Refleksi</button>`;
+  html += `<p class="status-msg" id="save-status"></p>`;
+  html += `<button class="btn-primary" id="send-online" style="width:100%;margin-top:8px">📤 Kirim hasil belajar (Kirim secara online ke guru)</button>`;
+  html += `<p class="status-msg" id="online-status">${answers.submitted ? '✅ Hasil belajar sudah terkirim ke guru. Terima kasih!' : ''}</p>`;
+  html += `<button id="export-btn" style="width:100%;padding:9px;font-size:14px;border-radius:4px;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--blue);margin-top:10px">⬇ Simpan / Ekspor hasil belajar (kirim manual ke guru)</button>`;
+  html += `<p style="font-size:12px;color:var(--muted);margin:8px 0 0">Gunakan ini kalau tidak ada internet. Di HP akan muncul pilihan <b>Simpan ke file</b> atau kirim lewat WhatsApp/email ke guru. Foto ikut tersimpan di dalam berkas.</p>`;
   return html;
 }
 
@@ -1390,17 +1484,21 @@ if(studentName){ enterApp(); }
 function render(i){
   current = i;
   const s = screens[i];
+  // Tandai Beranda/Petunjuk/Tujuan sebagai sudah dibaca saat dibuka
+  if(i<=2){ answers.seen = answers.seen || {}; if(!answers.seen[i]){ answers.seen[i]=true; saveAnswers(); } }
+  const locked = !canAccess(i);
   document.getElementById('screen-counter').textContent = `Layar ${i+1} / 8`;
   document.getElementById('url-bar').innerHTML = 'Pola Bilangan <span class="crumb-sep">›</span> ' + escapeHtml(s.url);
-  document.getElementById('screen-body').innerHTML = s.body();
+  document.getElementById('screen-body').innerHTML = locked ? lockedHTML(i) : s.body();
   document.getElementById('notes-text').textContent = s.note;
   document.getElementById('criteria-text').innerHTML = (s.criteria || []).map(c => `<span class="pill">✓ ${escapeHtml(c)}</span>`).join('');
   [...tabsEl.children].forEach((b,idx)=>{
     b.classList.toggle('active', idx===i);
     const done = screenDone(idx);
     b.classList.toggle('done', done);
+    b.classList.toggle('locked', !canAccess(idx));
     const chk = b.querySelector('.nav-check');
-    if(chk) chk.textContent = done ? '✓' : '';
+    if(chk) chk.textContent = done ? '✓' : (!canAccess(idx) ? '🔒' : '');
   });
   const activeNav = tabsEl.children[i];
   if(activeNav && tabsEl.scrollWidth > tabsEl.clientWidth + 4){
@@ -1410,7 +1508,12 @@ function render(i){
   document.getElementById('next-btn').disabled = i===screens.length-1;
   applyFontScale();
   updateMascot(i);
-  attachHandlers(i);
+  if(locked){
+    const go = document.getElementById('locked-go');
+    if(go) go.addEventListener('click', ()=> render(parseInt(go.dataset.goto,10)));
+  } else {
+    attachHandlers(i);
+  }
   animateCountUps();
   renderBadges();
 }
@@ -1583,7 +1686,8 @@ function attachHandlers(i){
       answers.refleksi = answers.refleksi || ['','',''];
       answers.refleksi[parseInt(tx.dataset.idx)] = tx.value; saveAnswers();
     }); });
-    const sf=document.getElementById('submit-final'); if(sf) sf.addEventListener('click', submitFinal);
+    const sr=document.getElementById('save-refl'); if(sr) sr.addEventListener('click', saveRefleksi);
+    const so=document.getElementById('send-online'); if(so) so.addEventListener('click', submitFinal);
     const eb=document.getElementById('export-btn'); if(eb) eb.addEventListener('click', exportResult);
   }
 }
@@ -1605,33 +1709,101 @@ function downloadMateri(){
   showToast('Materi diunduh (bisa dibuka luring).');
 }
 
-function exportResult(){
+async function exportResult(){
   answers.refleksi = answers.refleksi || ['','',''];
-  const lines = [
-    "HASIL BELAJAR - POLA BILANGAN","================================",
-    "Nama siswa : " + studentName,
-    "Waktu      : " + new Date().toLocaleString('id-ID'),"",
-    "Jawaban aktivitas : " + (answers.aktivitas || '-'),
-    "Jawaban diskusi   : " + (diskusiText() || '-'),
-    "Skor asesmen      : " + (answers.score ?? '-') + " / 100",
-    "Lampiran          : " + ((answers.lampiran||[]).length) + " berkas (foto/suara)","",
-    "Refleksi 1: Pola apa yang paling mudah kamu pahami?", answers.refleksi[0] || '-',"",
-    "Refleksi 2: Bagian mana yang masih membingungkan?", answers.refleksi[1] || '-',"",
-    "Refleksi 3: Di mana kamu menemukan pola di lingkungan sekitarmu?", answers.refleksi[2] || '-'
-  ];
-  const blob = new Blob([lines.join('\n')], {type: 'text/plain;charset=utf-8'});
+  document.querySelectorAll('.refleksi-input').forEach(tx=>{ answers.refleksi[parseInt(tx.dataset.idx)] = tx.value; });
+  const lamp = answers.lampiran || [];
+  // Kelompokkan lampiran berdasarkan menu (sumber): aktivitas, diskusi, refleksi, asesmen
+  const menuLabel = { aktivitas1:'Aktivitas', aktivitas2:'Aktivitas', aktivitas:'Aktivitas', diskusi:'Diskusi', refleksi:'Refleksi', 'asesmen-foto':'Asesmen', 'asesmen-lisan':'Asesmen', asesmen:'Asesmen' };
+  const groups = {};
+  lamp.forEach(a=>{ const key = menuLabel[a.sumber] || (a.sumber ? a.sumber.charAt(0).toUpperCase()+a.sumber.slice(1) : 'Lainnya'); (groups[key]=groups[key]||[]).push(a); });
+  let lampiranHTML = '';
+  Object.keys(groups).sort().forEach(menu=>{
+    lampiranHTML += `<h3>${escapeHtml(menu)}</h3><div class="galeri">`;
+    groups[menu].forEach(a=>{
+      if(a.jenis==='foto' && a.data) lampiranHTML += `<figure><img src="${a.data}" alt="foto ${escapeHtml(menu)}"><figcaption>📷 Foto</figcaption></figure>`;
+      else if(a.jenis==='suara' && a.data) lampiranHTML += `<figure><audio controls src="${a.data}"></audio><figcaption>🎤 Rekaman suara</figcaption></figure>`;
+    });
+    lampiranHTML += `</div>`;
+  });
+  if(!lampiranHTML) lampiranHTML = '<p style="color:#5f6368">Tidak ada lampiran foto/suara.</p>';
+
+  const doc = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hasil Belajar - ${escapeHtml(studentName||'Siswa')}</title>
+<style>
+  body{font-family:'Segoe UI',Arial,sans-serif;color:#202124;max-width:760px;margin:0 auto;padding:24px;line-height:1.6;}
+  .head{background:linear-gradient(120deg,#d93025,#f9ab00 40%,#1e8e3e 72%,#8e44ad);color:#fff;padding:22px 24px;border-radius:14px;margin-bottom:18px;}
+  .head h1{margin:0 0 4px;font-size:24px;} .head p{margin:2px 0;font-size:14px;opacity:.95;}
+  h2{color:#1557b0;border-bottom:2px solid #e8f0fe;padding-bottom:6px;margin:22px 0 10px;font-size:17px;}
+  h3{color:#e8710a;margin:14px 0 8px;font-size:15px;}
+  .kv{margin:6px 0;} .kv b{color:#202124;}
+  .box{background:#f8f9fa;border:1px solid #e3e6ea;border-radius:10px;padding:12px 14px;margin:6px 0;}
+  .galeri{display:flex;flex-wrap:wrap;gap:14px;}
+  figure{margin:0;text-align:center;} figure img{max-width:240px;max-height:240px;border-radius:10px;border:1px solid #dadce0;display:block;}
+  figcaption{font-size:12px;color:#5f6368;margin-top:4px;} audio{width:240px;}
+  .foot{color:#5f6368;font-size:12px;margin-top:24px;border-top:1px solid #e3e6ea;padding-top:8px;}
+</style></head><body>
+  <div class="head">
+    <h1>Hasil Belajar — Pola Bilangan</h1>
+    <p>Nama : <b>${escapeHtml(studentName||'-')}</b></p>
+    <p>Waktu : ${escapeHtml(new Date().toLocaleString('id-ID'))}</p>
+  </div>
+  <h2>Ringkasan</h2>
+  <p class="kv"><b>Skor asesmen:</b> ${answers.score ?? '-'} / 100</p>
+  <p class="kv"><b>Jawaban aktivitas:</b></p><div class="box">${escapeHtml(answers.aktivitas || '-')}</div>
+  <p class="kv"><b>Jawaban diskusi:</b></p><div class="box">${escapeHtml(diskusiText() || '-')}</div>
+  <h2>Refleksi</h2>
+  <p class="kv"><b>1. Pola apa yang paling mudah kamu pahami?</b></p><div class="box">${escapeHtml(answers.refleksi[0] || '-')}</div>
+  <p class="kv"><b>2. Bagian mana yang masih membingungkan?</b></p><div class="box">${escapeHtml(answers.refleksi[1] || '-')}</div>
+  <p class="kv"><b>3. Di mana kamu menemukan pola di lingkungan sekitarmu?</b></p><div class="box">${escapeHtml(answers.refleksi[2] || '-')}</div>
+  <h2>Lampiran Foto &amp; Suara</h2>
+  ${lampiranHTML}
+  <p class="foot">Dibuka dengan membuka berkas ini di HP/komputer. Foto sudah tertanam di dalam berkas — tidak perlu file terpisah.</p>
+</body></html>`;
+
+  const safeName = (studentName || 'siswa').replace(/[^a-z0-9]+/gi, '_');
+  const filename = `Hasil_Belajar_${safeName}.html`;
+  const blob = new Blob([doc], {type: 'text/html;charset=utf-8'});
+
+  // 1) HP: buka lembar "Bagikan/Simpan" (bisa Simpan ke File, WhatsApp, Drive)
+  try{
+    const file = new File([blob], filename, {type:'text/html'});
+    if(navigator.canShare && navigator.canShare({ files:[file] })){
+      await navigator.share({ files:[file], title:'Hasil Belajar Pola Bilangan',
+        text:'Hasil belajar Pola Bilangan — ' + (studentName||'siswa') });
+      showToast('Pilih "Simpan ke file" atau kirim ke guru.');
+      return;
+    }
+  }catch(e){
+    if(e && e.name === 'AbortError'){ return; }   // pengguna menutup lembar berbagi
+    /* jika gagal, lanjut ke unduhan biasa di bawah */
+  }
+
+  // 2) Fallback: unduh berkas langsung
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  const safeName = (studentName || 'siswa').replace(/[^a-z0-9]+/gi, '_');
-  a.href=url; a.download=`Hasil_Belajar_${safeName}.txt`;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  showToast('Hasil belajar tersimpan (foto ikut tertanam).');
 }
 
 function diskusiText(){ return (answers.diskusiPosts||[]).map(p => (typeof p==='string') ? p : (p.text || '[lampiran]')).join(' | '); }
 
-async function submitFinal(){
-  const statusEl = document.getElementById('final-status');
+function saveRefleksi(){
   answers.refleksi = answers.refleksi || ['','',''];
+  document.querySelectorAll('.refleksi-input').forEach(tx=>{ answers.refleksi[parseInt(tx.dataset.idx)] = tx.value; });
+  saveAnswers();
+  const st = document.getElementById('save-status');
+  if(st){ st.textContent = '✓ Refleksi tersimpan di perangkat ini.'; st.className = 'status-msg ok'; }
+  showToast('Refleksi tersimpan');
+}
+async function submitFinal(){
+  const statusEl = document.getElementById('online-status');
+  const btn = document.getElementById('send-online');
+  answers.refleksi = answers.refleksi || ['','',''];
+  document.querySelectorAll('.refleksi-input').forEach(tx=>{ answers.refleksi[parseInt(tx.dataset.idx)] = tx.value; });
   const ra = mediaAttach['refl'] || {};
   if(ra.photo) pushLampiran('foto','refleksi',ra.photo);
   if(ra.audio) pushLampiran('suara','refleksi',ra.audio);
@@ -1644,21 +1816,62 @@ async function submitFinal(){
     refleksi1: answers.refleksi[0] || '', refleksi2: answers.refleksi[1] || '', refleksi3: answers.refleksi[2] || '',
     lampiran: (answers.lampiran || []).slice(-12)
   };
-  answers.submitted = true; saveAnswers(); renderBadges();
-  statusEl.textContent = 'Mengirim…'; statusEl.className = 'status-msg';
+  saveAnswers();
+  if(btn){ btn.disabled = true; btn.textContent = '⏳ Mengirim…'; }
+  statusEl.textContent = 'Mengirim ke guru…'; statusEl.className = 'status-msg';
   if(!GAS_URL || GAS_URL.indexOf('TEMPEL_URL') !== -1){
+    answers.submitted = true; saveAnswers(); renderBadges();
     statusEl.textContent = '✓ Tersimpan di perangkat ini. (Belum terhubung ke Google Sheets — lihat panduan guru.)';
-    statusEl.className = 'status-msg ok'; return;
+    statusEl.className = 'status-msg ok';
+    if(btn){ btn.disabled = false; btn.textContent = '📤 Kirim hasil belajar (Kirim secara online ke guru)'; }
+    return;
+  }
+  // Tidak ada signal → simpan ke antrean, kirim otomatis saat online
+  if(!navigator.onLine){
+    queueOutbox(payload); answers.submitted = true; saveAnswers(); renderBadges();
+    statusEl.innerHTML = '📶 <b>Belum ada signal.</b> Hasil belajarmu tersimpan dan akan <b>otomatis terkirim</b> ke guru begitu HP terhubung internet.';
+    statusEl.className = 'status-msg ok';
+    if(btn){ btn.disabled = false; btn.textContent = '📤 Kirim ulang (jika sudah ada signal)'; }
+    return;
   }
   try{
     await fetch(GAS_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(payload) });
-    statusEl.textContent = '✓ Hasil belajar berhasil dikirim ke guru. Terima kasih, ' + studentName + '!';
+    answers.submitted = true; saveAnswers(); renderBadges();
+    statusEl.innerHTML = '✅ <b>Berhasil terkirim!</b> Hasil belajarmu sudah dikirim ke guru secara online. Terima kasih, ' + escapeHtml(studentName) + '! 🎉';
     statusEl.className = 'status-msg ok';
+    if(btn){ btn.textContent = '✅ Sudah terkirim'; btn.disabled = true; }
+    celebrate();
   }catch(e){
-    statusEl.textContent = 'Tersimpan di perangkat ini, tapi gagal terkirim ke server. Periksa koneksi internet.';
-    statusEl.className = 'status-msg err';
+    // Gagal walau katanya online → antre juga, coba lagi otomatis nanti
+    queueOutbox(payload); answers.submitted = true; saveAnswers(); renderBadges();
+    statusEl.innerHTML = '📶 Sinyal lemah. Hasil belajar tersimpan dan akan <b>otomatis terkirim</b> saat koneksi membaik.';
+    statusEl.className = 'status-msg ok';
+    if(btn){ btn.disabled = false; btn.textContent = '📤 Kirim ulang (jika sudah ada signal)'; }
   }
 }
+
+/* ====== ANTREAN OFFLINE (outbox) — kirim otomatis saat signal kembali ====== */
+function loadOutbox(){ try{ return JSON.parse(localStorage.getItem('lms_outbox') || '[]'); }catch(e){ return []; } }
+function saveOutbox(arr){ try{ localStorage.setItem('lms_outbox', JSON.stringify(arr)); }catch(e){} }
+function queueOutbox(payload){ const box = loadOutbox(); box.push(payload); saveOutbox(box); }
+async function flushOutbox(){
+  if(!navigator.onLine) return;
+  if(!GAS_URL || GAS_URL.indexOf('TEMPEL_URL') !== -1) return;
+  let box = loadOutbox();
+  if(!box.length) return;
+  const sisa = [];
+  for(const p of box){
+    try{ await fetch(GAS_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(p) }); }
+    catch(e){ sisa.push(p); }
+  }
+  saveOutbox(sisa);
+  if(sisa.length === 0){
+    showToast('✓ Hasil belajar yang tertunda berhasil terkirim ke guru.');
+    const st = document.getElementById('online-status');
+    if(st){ st.innerHTML = '✅ <b>Berhasil terkirim!</b> Hasil belajar yang tadi tertunda sudah sampai ke guru. 🎉'; st.className = 'status-msg ok'; }
+  }
+}
+window.addEventListener('online', flushOutbox);
 
 document.getElementById('prev-btn').addEventListener('click', ()=>{ if(current>0) render(current-1); });
 document.getElementById('next-btn').addEventListener('click', ()=>{ if(current<screens.length-1) render(current+1); });
@@ -1672,19 +1885,35 @@ function applyFontScale(){
 document.getElementById('a-minus').addEventListener('click', ()=>{ fontScale = Math.max(0.8, Math.round((fontScale-0.1)*10)/10); applyFontScale(); showToast('Ukuran teks ' + Math.round(fontScale*100) + '%'); });
 document.getElementById('a-plus').addEventListener('click', ()=>{ fontScale = Math.min(1.8, Math.round((fontScale+0.1)*10)/10); applyFontScale(); showToast('Ukuran teks ' + Math.round(fontScale*100) + '%'); });
 
-/* Bahasa daerah */
-function applyLang(){
-  document.getElementById('lang-btn').classList.toggle('on', localeDaerah);
-  localStorage.setItem('lms_lang', localeDaerah ? 'daerah' : 'id');
-  updateMascot(current);
-}
-document.getElementById('lang-btn').addEventListener('click', ()=>{
-  localeDaerah = !localeDaerah; applyLang();
-  showToast(localeDaerah ? 'Bahasa daerah (Melayu) aktif' : 'Bahasa Indonesia aktif');
-});
+/* Bahasa daerah dinonaktifkan (tombol dihapus) */
+function applyLang(){ /* no-op */ }
 
-/* Unduh materi */
-document.getElementById('download-btn').addEventListener('click', downloadMateri);
+/* Unduh materi — tampilkan 2 pilihan: Materi PDF & Video */
+function showUnduhMenu(){
+  const pdf = driveDownloadURL(MATERI_PDF_LINK);
+  const vid = driveDownloadURL(MATERI_VIDEO_LINK);
+  const ov = document.createElement('div'); ov.className = 'unduh-modal';
+  let items = '';
+  if(pdf) items += `<a class="unduh-btn pdf" href="${pdf}" target="_blank" rel="noopener" data-close>📄 Materi PDF</a>`;
+  if(vid) items += `<a class="unduh-btn vid" href="${vid}" target="_blank" rel="noopener" data-close>🎬 Video</a>`;
+  if(!pdf && !vid) items = `<p style="font-size:13px;color:var(--muted)">Belum ada berkas untuk diunduh.</p>
+      <button class="unduh-btn pdf" id="um-html" data-close>⬇ Simpan materi luring (HTML)</button>`;
+  ov.innerHTML = `<div class="unduh-sheet">
+      <p class="um-title">⬇ Unduh Materi</p>
+      <p class="um-sub">Pilih yang ingin diunduh:</p>
+      ${items}
+      <button class="um-cancel" data-close>Tutup</button>
+    </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e=>{
+    const t = e.target;
+    if(t.id==='um-html'){ downloadMateri(); }
+    if(t===ov || t.hasAttribute('data-close')){
+      if(t.tagName==='A') setTimeout(()=>ov.remove(), 300); else ov.remove();
+    }
+  });
+}
+document.getElementById('download-btn').addEventListener('click', showUnduhMenu);
 
 /* ====== NARATOR (Text-to-Speech) ====== */
 let speaking = false, ttsQueue = [], ttsResumeTimer = null, ttsVoice = null;
@@ -1743,6 +1972,14 @@ function applyDataSaver(){ document.getElementById('data-saver-btn').classList.t
 document.getElementById('data-saver-btn').addEventListener('click', ()=>{ dataSaver = !dataSaver; applyDataSaver(); });
 applyDataSaver();
 applyLang();
+
+/* ====== PWA: daftarkan service worker + coba kirim antrean tertunda ====== */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+window.addEventListener('load', ()=>{ setTimeout(flushOutbox, 1500); });
 </script>
 </body>
 </html>
