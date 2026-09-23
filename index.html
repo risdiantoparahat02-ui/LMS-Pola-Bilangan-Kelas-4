@@ -184,7 +184,9 @@
   .video-ph{position:relative;background:#202124;border-radius:8px;height:170px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;flex-direction:column;gap:10px;}
   .video-ph .play{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--blue);}
   .video-ph .cc{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:2px 8px;border-radius:4px;}
-  .transcript{background:#f8f9fa;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;color:var(--text);line-height:1.6;}
+  .transcript{background:#f8f9fa;border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.7;max-height:300px;overflow-y:auto;}
+  .transcript p{margin:0 0 10px;}
+  .transcript p:last-child{margin:0;}
 
   /* ====== INPUT ====== */
   input[type=text], textarea{
@@ -410,7 +412,7 @@
 
 <script>
 /* ====== KONFIGURASI ====== */
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwUa5v5hT6tfd8wcnDR3jTfeZFgKuH7_4DGdE4Pj786xPQe8WweNh4k8WfXh7HSdNaP5A/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzxyRymHmi2OekgEXEwpeWNcWgyj8kF97221eyBkcUHJuc54-8-8rW1feKpW4QQ0Sg8Ww/exec";
 
 /* ID video YouTube untuk menu Materi (bagian setelah "v=" atau "youtu.be/").
    Contoh URL https://www.youtube.com/watch?v=abcd1234XYZ  ->  isi "abcd1234XYZ".
@@ -721,8 +723,15 @@ function renderMateriVideo(){
   return `${player}
     ${fallback}
     <p style="font-size:13px;color:var(--muted);margin:4px 0 10px">🔊 Subtitle otomatis (closed caption) dinyalakan. Ketuk ikon <b>CC</b> di pemutar untuk memilih atau menerjemahkan bahasa subtitle.</p>
-    <p style="font-weight:700;margin:0 0 6px;font-size:15px">Transkrip video</p>
-    <div class="transcript">Halo teman-teman! Hari ini kita belajar pola bilangan. Pola bilangan adalah susunan angka dengan aturan tetap. Contohnya 2, 4, 6, 8 — setiap angka bertambah 2. Kalau diteruskan, angka berikutnya 10, lalu 12. Sekarang perhatikan 5, 10, 15 — bertambah berapa? Betul, bertambah 5! Ada juga pola berkurang, misalnya 20, 18, 16. Selamat belajar dan temukan pola di sekitarmu.</div>`;
+    <p style="font-weight:700;margin:0 0 6px;font-size:15px">Transkrip video: Pola Gambar dan Bilangan</p>
+    <div class="transcript">
+      <p>Assalamualaikum warahmatullahi wabarakatuh. Welcome back to my channel. Oke kakak, di sini Miss menjelaskan pola gambar dan pola bilangan ya. Karena ini tidak ada di buku, jadi kakak bisa melihat dari YouTube-nya Miss ini saja ya, Nak. Oke, apa yang dimaksud pola gambar dan pola bilangan? Dulu di kelas 1 kakak juga sudah mengenal tentang pola gambar, kan, jadi beberapa akan kita review. Coba kita mulai, yang pertama adalah pola gambar. Coba perhatikan pola gambar berikut. Dapatkah kamu menebak banyak benda selanjutnya?</p>
+      <p>Kita coba hitung ya. Di sini yang pertama punya berapa bola? Ada 2 bola. Selanjutnya ada 4 bola, lalu ada 6 bola, dan berikutnya ada 8 bola. Nah, 2 ke 4 ini ditambah berapa, atau lompat berapa? Betul, ditambah 2. Maka 4 ke 6 juga ditambah 2, dan 6 ke 8 juga ditambah 2. Nah, itu yang dimaksud pola gambar membesar, dan ini polanya berbentuk persegi — namanya pola segi empat atau pola persegi. Misalkan jika ditanya berapa pola ke-5: karena ini 1, 2, 3, 4, berarti pola ke-5 tinggal 8 + 2 = 10. Jadi di pola ke-5 kakak menggambar bolanya tinggal ditambahi hingga berjumlah 10.</p>
+      <p>Kita lanjut. Di sini ada pola gambar membesar juga: ada 2 apel yang pertama, lalu 5, lalu 8 — maka ini penjumlahan 3. Jadi 8 ditambah 3 sama dengan 11; kita cek, apelnya sudah ada 11. Jika ditanya pola ke-6, karena ini masih pola ke-4: dari pola ke-5 yaitu 11 + 3 = 14, maka pola ke-6 nya 14 + 3 = 17.</p>
+      <p>Sekarang pola gambar mengecil. Pola gambar mengecil artinya pola gambar yang dikurangi, jadi semakin ke kanan dia semakin kecil — berbeda dengan pola membesar yang semakin ke kanan semakin besar. Kakak hitung dulu: polanya ada 10, lalu 8, lalu 6. 10 ke 8 itu dikurangi 2, maka setiap pola dikurangi 2. Jadi pola keempatnya adalah 4. Jika ditanya pola kelima, maka 4 dikurangi 2 = 2.</p>
+      <p>Sekarang latihan: tentukan bilangan yang tepat sesuai pola yang diberikan. 96 ke 85 — ini pola membesar atau mengecil? Betul, semakin ke kanan semakin kecil, jadi pola mengecil. 96 dikurangi 85 = 11. Kita cek lagi: 85 dikurangi 74 = 11 juga. Maka jika ditanya pola kelimanya: 63 dikurangi 11 = 52.</p>
+      <p>Nah, kalau sudah, Alhamdulillah, materi pola bilangan kali ini rasanya kakak sudah mahir semuanya. Kuncinya: perhatikan apakah pola semakin membesar atau semakin mengecil. Jika ke kanan semakin membesar maka polanya ditambah; jika ke kanan semakin mengecil maka dikurangi. Oke kakak, selamat belajar, semoga diberikan kemudahan. Thank you, Kak. Assalamualaikum warahmatullahi wabarakatuh.</p>
+    </div>`;
 }
 
 function screenDone(idx){
@@ -832,7 +841,11 @@ function renderAktivitas(){
   if(!answers.aktLog){ answers.aktLog=[{who:'bot',text:aktivitasSteps[0].bot}]; answers.aktStep=0; saveAnswers(); }
   const done = (answers.aktStep||0) >= aktivitasSteps.length;
   let html = `<h2>Aktivitas Pembelajaran</h2><p class="desc">Menyelidiki pola bersama pemandu (guided inquiry)</p>`;
-  html += `<p style="font-size:16px;font-weight:600;letter-spacing:2px;text-align:center;margin:0 0 6px">3 · 6 · 9 · 12 · ?</p>`;
+  html += `<p style="font-size:20px;font-weight:700;letter-spacing:3px;text-align:center;margin:0 0 8px;color:var(--blue-dark)">3 · 6 · 9 · 12 · ?</p>`;
+  html += `<div class="box" style="border-left:4px solid var(--blue);background:var(--blue-bg)">
+    <p style="margin:0 0 4px;font-weight:700;font-size:14px;color:var(--blue-dark)">❓ Pertanyaan</p>
+    <p style="margin:0;font-size:14px">Perhatikan barisan <b>3, 6, 9, 12</b>. Berapakah bilangan berikutnya (menggantikan tanda <b>?</b>), dan apa aturan polanya? Tulis jawabanmu, lalu ikuti langkah dari pemandu di bawah.</p>
+  </div>`;
   html += `<p style="font-size:13px;color:var(--muted);text-align:center;margin:0 0 12px">Jawab lewat: ⌨ teks · 🎤 suara · 📷 foto coretan</p>`;
   html += answers.aktLog.map(m=>`<div class="chat-bubble ${m.who==='me'?'other':'me'}">${m.who==='bot'?'🤖 ':''}${escapeHtml(m.text)}</div>`).join('');
   if(!done){
@@ -1135,15 +1148,23 @@ function attachHandlers(i){
       answers.aktLog.push({who:'me', text:(v||'(jawaban lewat lampiran)')+extra});
       if(a.photo) pushLampiran('foto','aktivitas',a.photo);
       if(a.audio) pushLampiran('suara','aktivitas',a.audio);
+      const adaLampiran = !!(a.photo || a.audio);
       mediaAttach['akt-input']={};
       const step = aktivitasSteps[answers.aktStep];
-      if(step.check(v)){
+      if(v && step.check(v)){
+        // Jawaban teks benar
         answers.aktLog.push({who:'bot', text:step.ok});
         answers.aktStep++;
         if(answers.aktStep < aktivitasSteps.length){ answers.aktLog.push({who:'bot', text:aktivitasSteps[answers.aktStep].bot}); }
         else { answers.aktivitas = 'Menyelesaikan aktivitas terpandu (menemukan aturan +3).'; celebrate(); showToast('Hebat! Aktivitas selesai!'); }
         saveAnswers(); renderBadges(); render(4);
+      } else if(!v && adaLampiran){
+        // Jawaban hanya lewat foto/suara — TIDAK dianggap salah; pemandu tak bisa membaca gambar/suara
+        answers.aktivitas = answers.aktivitas || 'Menjawab aktivitas lewat foto/suara (diperiksa guru).';
+        answers.aktLog.push({who:'bot', text:'👍 Jawabanmu lewat ' + (a.photo?'foto':'') + (a.photo&&a.audio?' & ':'') + (a.audio?'suara':'') + ' sudah terkirim dan akan diperiksa gurumu. Pemandu belum bisa membaca gambar/suara — kalau mau langsung dicek, coba ketik angkanya, atau tekan 🗣️ Suara→Teks untuk mengubah suaramu jadi tulisan.'});
+        saveAnswers(); renderBadges(); showToast('Jawaban foto/suara terkirim ✓'); render(4);
       } else {
+        // Ada teks tapi belum tepat
         answers.aktLog.push({who:'bot', text:'Hampir! '+step.hint});
         saveAnswers(); render(4);
       }
