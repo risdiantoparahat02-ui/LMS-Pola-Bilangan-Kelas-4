@@ -139,6 +139,7 @@
 
   /* ====== LAYOUT ====== */
   .layout{max-width:1040px;margin:20px auto;padding:0 20px;display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start;}
+  .layout>*{min-width:0;}   /* cegah kolom grid melebihi lebar layar HP (overflow horizontal) */
   .sidebar{position:sticky;top:84px;}
   .side-label{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:0 0 8px 4px;}
 
@@ -1997,56 +1998,84 @@ function normalizeForSpeech(text){
 function splitIntoChunks(text){
   const parts = text.split(/(?<=[.!?\n])\s+/).map(p=>p.trim()).filter(Boolean);
   const chunks=[]; let buf='';
-  parts.forEach(p=>{ if((buf+' '+p).length>180){ if(buf) chunks.push(buf.trim()); buf=p; } else { buf=buf?buf+' '+p:p; } });
+  // potongan pendek (<=110) agar tiap ucapan jauh di bawah batas ~15 detik (ramah Android)
+  parts.forEach(p=>{
+    while(p.length>110){ let cut=p.lastIndexOf(',',110); if(cut<40) cut=p.lastIndexOf(' ',110); if(cut<40) cut=110;
+      if(buf) { chunks.push(buf.trim()); buf=''; } chunks.push(p.slice(0,cut).trim()); p=p.slice(cut).trim(); }
+    if((buf+' '+p).length>110){ if(buf) chunks.push(buf.trim()); buf=p; } else { buf=buf?buf+' '+p:p; }
+  });
   if(buf) chunks.push(buf.trim());
   return chunks;
 }
 
-// ==== Bacakan + sorot warna teks yang sedang dibaca (per baris/kalimat) ====
+// ==== Bacakan + sorot warna + tahan-putus (watchdog) ====
 let readEls=[], readPos=0, hlEl=null;
+let curChunks=[], curCi=0, curDone=true, expectedEnd=0, ttsWatch=null, ttsHidden=false;
 function clearHighlight(){ if(hlEl){ hlEl.classList.remove('tts-reading'); hlEl=null; } }
 function collectReadEls(){
   const root=document.getElementById('screen-body');
   return [...root.querySelectorAll('h1,h2,h3,h4,p,li')].filter(el=>{
-    if(el.querySelector('h1,h2,h3,h4,p,li')) return false;      // hanya blok teks paling dalam
-    return normalizeForSpeech(el.innerText||'').trim().length>0; // ada yang bisa dibaca
+    if(el.querySelector('h1,h2,h3,h4,p,li')) return false;
+    return normalizeForSpeech(el.innerText||'').trim().length>0;
   });
 }
 function finishTTS(){
-  clearHighlight(); speaking=false;
+  clearHighlight(); speaking=false; curDone=true;
   const btn=document.getElementById('tts-btn'); if(btn) btn.classList.remove('on');
-  if(ttsResumeTimer){ clearInterval(ttsResumeTimer); ttsResumeTimer=null; }
+  if(ttsWatch){ clearInterval(ttsWatch); ttsWatch=null; }
 }
-function speakEls(){
+function nextEl(){
   if(!speaking) return;
   if(readPos>=readEls.length){ finishTTS(); return; }
   const el=readEls[readPos++];
   const txt=normalizeForSpeech(el.innerText||'');
-  if(!txt.trim()){ speakEls(); return; }
+  if(!txt.trim()){ nextEl(); return; }
   clearHighlight(); hlEl=el; el.classList.add('tts-reading');
   try{ el.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){}
-  const chunks=splitIntoChunks(txt); let ci=0;
-  (function nextChunk(){
-    if(!speaking) return;
-    if(ci>=chunks.length){ speakEls(); return; }
-    const u=new SpeechSynthesisUtterance(chunks[ci++]);
-    u.lang='id-ID'; if(ttsVoice) u.voice=ttsVoice; u.rate=0.92; u.pitch=1.0;
-    u.onend=nextChunk; u.onerror=nextChunk;
-    window.speechSynthesis.speak(u);
-  })();
+  curChunks=splitIntoChunks(txt); curCi=0; speakCurrent();
 }
-function stopSpeaking(){ window.speechSynthesis.cancel(); finishTTS(); }
+function speakCurrent(){
+  if(!speaking) return;
+  if(curCi>=curChunks.length){ nextEl(); return; }
+  const text=curChunks[curCi];
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='id-ID'; if(ttsVoice) u.voice=ttsVoice; u.rate=0.92; u.pitch=1.0;
+  curDone=false;
+  expectedEnd = Date.now() + Math.max(2500, (text.length/9)*1000) + 1200; // perkiraan durasi + buffer
+  u.onend  = ()=>{ if(curDone) return; curDone=true; curCi++; speakCurrent(); };
+  u.onerror= ()=>{ if(curDone) return; curDone=true; curCi++; speakCurrent(); };
+  try{ window.speechSynthesis.speak(u); }catch(e){ curDone=true; curCi++; speakCurrent(); }
+}
+function startWatchdog(){
+  if(ttsWatch) clearInterval(ttsWatch);
+  ttsWatch=setInterval(()=>{
+    if(!speaking || ttsHidden) return;
+    const ss=window.speechSynthesis;
+    // Bila mesin berhenti tapi sinyal "selesai" (onend) tak terkirim -> lanjutkan sendiri
+    if(!curDone && !ss.speaking && !ss.pending && Date.now()>expectedEnd){
+      curDone=true; curCi++; speakCurrent();
+    }
+  }, 500);
+}
+// Android menghentikan suara saat aplikasi di latar belakang; lanjutkan saat kembali
+document.addEventListener('visibilitychange', ()=>{
+  ttsHidden = document.hidden;
+  if(!document.hidden && speaking){
+    const ss=window.speechSynthesis;
+    if(!ss.speaking && !ss.pending){ curDone=false; speakCurrent(); } // ulangi kalimat terakhir
+  }
+});
+function stopSpeaking(){ try{ window.speechSynthesis.cancel(); }catch(e){} finishTTS(); }
 document.getElementById('tts-btn').addEventListener('click', ()=>{
   const btn=document.getElementById('tts-btn');
   if(speaking){ stopSpeaking(); return; }
   if(!('speechSynthesis' in window)){ alert('Maaf, browser ini tidak mendukung fitur bacakan suara.'); return; }
   readEls=collectReadEls();
   if(!readEls.length) return;
-  window.speechSynthesis.cancel();
-  readPos=0; speaking=true; btn.classList.add('on');
-  speakEls();
-  if(ttsResumeTimer) clearInterval(ttsResumeTimer);
-  ttsResumeTimer=setInterval(()=>{ if(window.speechSynthesis.speaking){ window.speechSynthesis.pause(); window.speechSynthesis.resume(); } }, 10000);
+  try{ window.speechSynthesis.cancel(); }catch(e){}
+  readPos=0; speaking=true; curDone=true; btn.classList.add('on');
+  startWatchdog();
+  nextEl();
 });
 
 let dataSaver = localStorage.getItem('lms_data_saver') === '1';
