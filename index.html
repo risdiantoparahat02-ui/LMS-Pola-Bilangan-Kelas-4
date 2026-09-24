@@ -1516,6 +1516,17 @@ function confetti(){
 function celebrate(){ confetti(); playChime(); }
 
 /* ====== RENDER UTAMA ====== */
+let __lastScreenShown = -1, __firstRenderDone = false;
+function scrollToContent(){
+  try{
+    // Selalu tampilkan JUDUL UTAMA layar di bagian atas saat berpindah menu
+    const body = document.getElementById('screen-body');
+    const el = (body && body.querySelector('h1,h2')) || document.querySelector('.content-card') || body;
+    if(!el) return;
+    const top = el.getBoundingClientRect().top + window.pageYOffset - 74; // ruang untuk bilah atas
+    window.scrollTo({ top: Math.max(0, top), behavior:'smooth' });
+  }catch(e){}
+}
 const tabsEl = document.getElementById('tabs');
 screens.forEach((s,i)=>{
   const b = document.createElement('button');
@@ -1564,6 +1575,9 @@ function render(i){
   }
   animateCountUps();
   renderBadges();
+  // Saat berpindah menu, geser layar ke bagian konten (khusus tampilan HP)
+  if(__firstRenderDone && i !== __lastScreenShown){ setTimeout(scrollToContent, 60); }
+  __lastScreenShown = i; __firstRenderDone = true;
 }
 
 function animateCountUps(){
