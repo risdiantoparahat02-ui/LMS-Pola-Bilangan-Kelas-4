@@ -191,13 +191,13 @@
   #mascot .bubble{font-size:14px;font-weight:500;color:var(--blue-dark);line-height:1.4;}
 
   .screen-body{padding:24px;min-height:380px;}
-  .screen-body h2{font-size:22px;font-weight:500;margin:0 0 4px;color:var(--text);}
-  .screen-body .desc{font-size:14px;color:var(--muted);margin:0 0 18px;}
+  .screen-body h2{font-size:24px;font-weight:800;margin:0 0 6px;color:var(--text);letter-spacing:-.2px;}
+  .screen-body .desc{font-size:15px;color:#3c4043;margin:0 0 18px;line-height:1.5;}
 
   /* Skala teks konten — tombol A− / A+ lewat variabel --fs */
   #screen-body{font-size:calc(15px * var(--fs,1));}
-  #screen-body h2{font-size:calc(22px * var(--fs,1));}
-  #screen-body .desc{font-size:calc(14px * var(--fs,1));}
+  #screen-body h2{font-size:calc(24px * var(--fs,1));}
+  #screen-body .desc{font-size:calc(15px * var(--fs,1));}
   #screen-body .btn-primary,#screen-body input[type=text],#screen-body textarea,#screen-body .option-grid button{font-size:calc(15px * var(--fs,1));}
   #screen-body [style*="font-size:11px"]{font-size:calc(13px * var(--fs,1)) !important;}
   #screen-body [style*="font-size:12px"]{font-size:calc(14px * var(--fs,1)) !important;}
@@ -224,13 +224,13 @@
 
   /* ====== KARTU TUJUAN ====== */
   .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .card-grid .card{padding:14px;box-shadow:none;border-top:3px solid var(--blue);}
+  .card-grid .card{padding:18px 16px;box-shadow:none;border-top:4px solid var(--blue);}
   .card-grid .card:nth-child(2){border-top-color:var(--green);}
   .card-grid .card:nth-child(3){border-top-color:var(--amber);}
   .card-grid .card:nth-child(4){border-top-color:#9334e6;}
-  .card-grid .card .ico{font-size:22px;}
-  .card-grid .card .t{font-size:14px;font-weight:700;margin:4px 0 4px;color:var(--text);}
-  .card-grid .card .d{font-size:13px;color:var(--muted);margin:0;}
+  .card-grid .card .ico{font-size:32px;line-height:1;}
+  .card-grid .card .t{font-size:calc(18px * var(--fs,1));font-weight:800;margin:8px 0 6px;color:var(--text);line-height:1.3;}
+  .card-grid .card .d{font-size:calc(15px * var(--fs,1));color:#3c4043;margin:0;line-height:1.55;}
 
   /* ====== LANGKAH / PETA ====== */
   .step{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #f1f3f4;}
