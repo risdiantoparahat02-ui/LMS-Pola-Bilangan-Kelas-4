@@ -409,6 +409,11 @@
   .locked-box p{font-size:14px;color:var(--muted);margin:0 auto 18px;max-width:420px;}
   /* Tab terkunci */
   .nav-item.locked{opacity:.6;}
+  .tts-reading{
+    background:#fff3a0 !important; color:#3a2b00 !important;
+    box-shadow:0 0 0 4px #fff3a0; border-radius:5px;
+    transition:background .12s ease;
+  }
   .terkirim-note{
     display:flex;gap:8px;align-items:flex-start;text-align:left;
     background:var(--green-bg);border:1px solid #a8d5b5;border-radius:12px;
@@ -1522,6 +1527,7 @@ screens.forEach((s,i)=>{
 if(studentName){ enterApp(); }
 
 function render(i){
+  try{ if(speaking && typeof stopSpeaking==='function') stopSpeaking(); }catch(e){}  // hentikan Bacakan saat pindah layar
   current = i;
   const s = screens[i];
   // Tandai Beranda/Petunjuk/Tujuan sebagai sudah dibaca saat dibuka
@@ -1964,14 +1970,29 @@ function pickIndonesianVoice(){
 }
 if('speechSynthesis' in window){ pickIndonesianVoice(); window.speechSynthesis.onvoiceschanged = pickIndonesianVoice; }
 
+// Bersihkan teks agar simbol/tanda baca TIDAK ikut diucapkan
 function normalizeForSpeech(text){
-  return text
-    .replace(/[−–—-]/g, ' kurang ').replace(/\+/g, ' tambah ')
-    .replace(/[×✕]/g, ' kali ').replace(/(\d)\s*[x*]\s*(\d)/gi, '$1 kali $2')
-    .replace(/[÷]/g, ' dibagi ').replace(/=/g, ' sama dengan ')
-    .replace(/→/g, ' menjadi ').replace(/[·•]/g, ' , ')
-    .replace(/[…]|\.\.\./g, ' dan seterusnya ').replace(/[✓✅]/g, ' benar ')
-    .replace(/[?]/g, ' berapa ').replace(/\s{2,}/g, ' ').trim();
+  let t = text;
+  try{ t = t.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}\u{FE00}-\u{FE0F}\u{200D}\u{2022}\u{25A0}-\u{25FF}\u{2B24}]/gu,' '); }catch(e){}
+  return t
+    // simbol matematika -> kata (hanya yang bermakna)
+    .replace(/→/g,' menjadi ')
+    .replace(/−/g,' kurang ')          // minus matematika (−)
+    .replace(/[–—]/g,', ')                   // en/em dash -> jeda (bukan "kurang")
+    .replace(/(\d)\s*-\s*(\d)/g,'$1 sampai $2').replace(/-/g,' ')
+    .replace(/\+/g,' tambah ')
+    .replace(/[×✕]/g,' kali ').replace(/(\d)\s*[x*]\s*(\d)/gi,'$1 kali $2')
+    .replace(/÷/g,' dibagi ').replace(/=/g,' sama dengan ')
+    .replace(/(\d)\s*\/\s*(\d)/g,'$1 per $2')
+    // buang simbol dekoratif & tanda baca yang tak perlu diucapkan
+    .replace(/[·•●○◦▪▲△►▶◆✦✧✱*|/\\~^#@%&_<>«»“”"'‘’`\[\](){}]/g,' ')
+    .replace(/…|\.\.\./g,', ')
+    .replace(/[✓✔✅]/g,' ')
+    .replace(/\?/g,' ')
+    .replace(/[;:]/g,', ')
+    .replace(/\s*(,\s*){2,}/g,', ')          // rapikan koma berulang
+    .replace(/[\s,]+$/,'')                    // buang koma/spasi di akhir
+    .replace(/\s{2,}/g,' ').trim();
 }
 function splitIntoChunks(text){
   const parts = text.split(/(?<=[.!?\n])\s+/).map(p=>p.trim()).filter(Boolean);
@@ -1980,25 +2001,50 @@ function splitIntoChunks(text){
   if(buf) chunks.push(buf.trim());
   return chunks;
 }
-function speakNextChunk(){
-  const btn=document.getElementById('tts-btn');
-  if(ttsQueue.length===0){ speaking=false; btn.classList.remove('on'); if(ttsResumeTimer){ clearInterval(ttsResumeTimer); ttsResumeTimer=null; } return; }
-  const chunk=ttsQueue.shift();
-  const u=new SpeechSynthesisUtterance(chunk);
-  u.lang='id-ID'; if(ttsVoice) u.voice=ttsVoice; u.rate=0.92; u.pitch=1.0;
-  u.onend=speakNextChunk; u.onerror=speakNextChunk;
-  window.speechSynthesis.speak(u);
+
+// ==== Bacakan + sorot warna teks yang sedang dibaca (per baris/kalimat) ====
+let readEls=[], readPos=0, hlEl=null;
+function clearHighlight(){ if(hlEl){ hlEl.classList.remove('tts-reading'); hlEl=null; } }
+function collectReadEls(){
+  const root=document.getElementById('screen-body');
+  return [...root.querySelectorAll('h1,h2,h3,h4,p,li')].filter(el=>{
+    if(el.querySelector('h1,h2,h3,h4,p,li')) return false;      // hanya blok teks paling dalam
+    return normalizeForSpeech(el.innerText||'').trim().length>0; // ada yang bisa dibaca
+  });
 }
-function stopSpeaking(){ window.speechSynthesis.cancel(); ttsQueue=[]; speaking=false; if(ttsResumeTimer){ clearInterval(ttsResumeTimer); ttsResumeTimer=null; } document.getElementById('tts-btn').classList.remove('on'); }
+function finishTTS(){
+  clearHighlight(); speaking=false;
+  const btn=document.getElementById('tts-btn'); if(btn) btn.classList.remove('on');
+  if(ttsResumeTimer){ clearInterval(ttsResumeTimer); ttsResumeTimer=null; }
+}
+function speakEls(){
+  if(!speaking) return;
+  if(readPos>=readEls.length){ finishTTS(); return; }
+  const el=readEls[readPos++];
+  const txt=normalizeForSpeech(el.innerText||'');
+  if(!txt.trim()){ speakEls(); return; }
+  clearHighlight(); hlEl=el; el.classList.add('tts-reading');
+  try{ el.scrollIntoView({block:'center',behavior:'smooth'}); }catch(e){}
+  const chunks=splitIntoChunks(txt); let ci=0;
+  (function nextChunk(){
+    if(!speaking) return;
+    if(ci>=chunks.length){ speakEls(); return; }
+    const u=new SpeechSynthesisUtterance(chunks[ci++]);
+    u.lang='id-ID'; if(ttsVoice) u.voice=ttsVoice; u.rate=0.92; u.pitch=1.0;
+    u.onend=nextChunk; u.onerror=nextChunk;
+    window.speechSynthesis.speak(u);
+  })();
+}
+function stopSpeaking(){ window.speechSynthesis.cancel(); finishTTS(); }
 document.getElementById('tts-btn').addEventListener('click', ()=>{
   const btn=document.getElementById('tts-btn');
   if(speaking){ stopSpeaking(); return; }
   if(!('speechSynthesis' in window)){ alert('Maaf, browser ini tidak mendukung fitur bacakan suara.'); return; }
-  const text=document.getElementById('screen-body').innerText;
-  if(!text.trim()) return;
+  readEls=collectReadEls();
+  if(!readEls.length) return;
   window.speechSynthesis.cancel();
-  ttsQueue=splitIntoChunks(normalizeForSpeech(text));
-  speaking=true; btn.classList.add('on'); speakNextChunk();
+  readPos=0; speaking=true; btn.classList.add('on');
+  speakEls();
   if(ttsResumeTimer) clearInterval(ttsResumeTimer);
   ttsResumeTimer=setInterval(()=>{ if(window.speechSynthesis.speaking){ window.speechSynthesis.pause(); window.speechSynthesis.resume(); } }, 10000);
 });
