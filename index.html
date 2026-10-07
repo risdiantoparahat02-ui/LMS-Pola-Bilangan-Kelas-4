@@ -496,6 +496,11 @@
   input.lat-input{width:48px !important;min-height:44px;flex-shrink:0;padding:10px 2px !important;font-size:16px;text-align:center;font-weight:700;border-radius:8px;border:1.5px solid var(--border);margin:0 !important;background:var(--surface);color:var(--text);}
   input.lat-input.lat-correct{border-color:var(--green);background:var(--green-bg);color:var(--green-text);}
   input.lat-input.lat-wrong{border-color:var(--red);background:var(--red-bg);color:var(--red);}
+  input.lat-input.lat-empty{border-color:var(--amber);background:var(--amber-bg);color:var(--amber-text);}
+  .lat-row-wrap{border-bottom:1px solid #f1f3f4;}
+  .lat-row-wrap .lat-row{border-bottom:none;padding-bottom:4px;}
+  .lat-answer-hint{font-size:12.5px;color:var(--red);background:var(--red-bg);border-radius:8px;padding:6px 10px;margin:0 0 10px;}
+  .lat-answer-hint b{color:var(--red);}
 
   /* ====== NAVIGASI MATERI ====== */
   .materi-dots{display:flex;gap:5px;flex-wrap:wrap;margin:0 0 14px;}
@@ -541,6 +546,7 @@
   .jodoh-sel{font-size:15px;font-weight:700;padding:9px 12px;border-radius:8px;border:2px solid var(--border);background:#fff;color:var(--text);min-width:120px;}
   .jodoh-sel.lat-correct{border-color:var(--green);background:var(--green-bg);color:var(--green-text);}
   .jodoh-sel.lat-wrong{border-color:var(--red);background:var(--red-bg);color:var(--red);}
+  .jodoh-sel.lat-empty{border-color:var(--amber);background:var(--amber-bg);color:var(--amber-text);}
 
   /* ====== RESPONSIF HP ====== */
   @media (max-width:820px){
@@ -664,11 +670,6 @@
         <div class="notes-box" id="notes-wrap">
           <p class="label">Progresmu</p>
           <p class="text" id="notes-text"></p>
-        </div>
-
-        <div class="notes-box" id="criteria-wrap">
-          <p class="label">Kriteria inklusif yang dipenuhi</p>
-          <div id="criteria-text"></div>
         </div>
       </main>
     </div>
@@ -873,44 +874,76 @@ const latihanGroups = [
   { label:'Latihan 1', from:0, to:5, key:'latihanChecked1', btn:'latihan-check-1' },
   { label:'Latihan 2', from:5, to:10, key:'latihanChecked2', btn:'latihan-check-2' }
 ];
+const LATIHAN_MAX_PERCOBAAN = 3;
 function renderLatihan(){
   const jawab = answers.latihan || [];
-  let html = `<p style="font-size:13px;margin:0 0 10px">Lengkapilah pola berikut dengan mengisi dua kotak jawaban. Setiap latihan punya tombol <b>Cek jawaban</b> sendiri.</p>`;
+  let html = `<p style="font-size:13px;margin:0 0 10px">Lengkapilah pola berikut dengan mengisi dua kotak jawaban. Kamu punya <b>3 kali kesempatan</b> menekan tombol Cek — warna kotak langsung terlihat, dan catatan jawaban yang benar baru muncul di percobaan ke-3.</p>`;
   latihanGroups.forEach(g=>{
-    const checked = !!answers[g.key];
+    const attempts = answers[g.key+'Attempts'] || 0;
+    const shown = !!answers[g.key];
+    const total=(g.to-g.from)*2; let benarNow=0;
+    for(let i=g.from;i<g.to;i++){ const v=jawab[i]||['','']; const soal=latihanSoal[i];
+      if(String(v[0]).trim()===String(soal.jawaban[0])) benarNow++;
+      if(String(v[1]).trim()===String(soal.jawaban[1])) benarNow++; }
+    const allCorrect = benarNow===total;
+    const showHint = shown && (attempts>=LATIHAN_MAX_PERCOBAAN || allCorrect);
     html += `<div class="lat-group"><p class="lat-title">📝 ${g.label}</p>`;
     for(let i=g.from;i<g.to;i++){
       const soal = latihanSoal[i]; const v = jawab[i] || ['',''];
-      let cls1='', cls2='';
-      if(checked){
-        cls1 = String(v[0]).trim() === String(soal.jawaban[0]) ? 'lat-correct' : 'lat-wrong';
-        cls2 = String(v[1]).trim() === String(soal.jawaban[1]) ? 'lat-correct' : 'lat-wrong';
+      let cls1='', cls2='', hint='';
+      if(shown){
+        const kosong1 = String(v[0]).trim()==='', kosong2 = String(v[1]).trim()==='';
+        const benar1 = !kosong1 && String(v[0]).trim() === String(soal.jawaban[0]);
+        const benar2 = !kosong2 && String(v[1]).trim() === String(soal.jawaban[1]);
+        cls1 = kosong1 ? 'lat-empty' : (benar1 ? 'lat-correct' : 'lat-wrong');
+        cls2 = kosong2 ? 'lat-empty' : (benar2 ? 'lat-correct' : 'lat-wrong');
+        if(showHint && (!benar1 || !benar2)){
+          hint = `<div class="lat-answer-hint">${kosong1||kosong2?'✏️ Belum lengkap.':'✗ Belum tepat.'} Jawaban yang benar: <b>${soal.jawaban[0]}</b> dan <b>${soal.jawaban[1]}</b></div>`;
+        }
       }
-      html += `<div class="lat-row"><span class="lat-no">${i+1}.</span><span class="lat-pola">${soal.pola.replace(/___/g,'<b>…</b>')}</span>
-        <input type="text" inputmode="numeric" class="lat-input ${cls1}" data-i="${i}" data-k="0" value="${escapeHtml(v[0])}" placeholder="?">
-        <input type="text" inputmode="numeric" class="lat-input ${cls2}" data-i="${i}" data-k="1" value="${escapeHtml(v[1])}" placeholder="?"></div>`;
+      html += `<div class="lat-row-wrap"><div class="lat-row"><span class="lat-no">${i+1}.</span><span class="lat-pola">${soal.pola.replace(/___/g,'<b>…</b>')}</span>
+        <input type="text" inputmode="numeric" class="lat-input ${cls1}" data-i="${i}" data-k="0" value="${escapeHtml(v[0])}" placeholder="…">
+        <input type="text" inputmode="numeric" class="lat-input ${cls2}" data-i="${i}" data-k="1" value="${escapeHtml(v[1])}" placeholder="…"></div>${hint}</div>`;
     }
-    html += `<button class="btn-primary" id="${g.btn}" style="margin-top:10px">Cek jawaban ${g.label}</button>`;
-    if(checked){
-      const total=(g.to-g.from)*2; let benar=0;
-      for(let i=g.from;i<g.to;i++){ const v=jawab[i]||['','']; const soal=latihanSoal[i];
-        if(String(v[0]).trim()===String(soal.jawaban[0])) benar++;
-        if(String(v[1]).trim()===String(soal.jawaban[1])) benar++; }
-      html += `<p class="status-msg ok" style="margin-top:8px">✓ ${g.label}: benar ${benar} dari ${total} kotak.</p>`;
+    let btnLabel;
+    if(attempts===0) btnLabel = `Cek jawaban ${g.label}`;
+    else if(allCorrect || attempts>=LATIHAN_MAX_PERCOBAAN) btnLabel = `Cek ulang ${g.label}`;
+    else btnLabel = `Cek jawaban (percobaan ke-${attempts+1} dari ${LATIHAN_MAX_PERCOBAAN})`;
+    html += `<button class="btn-primary" id="${g.btn}" style="margin-top:10px">${btnLabel}</button>`;
+    if(shown){
+      if(allCorrect){
+        html += `<p class="status-msg ok" style="margin-top:8px">✓ ${g.label}: benar ${benarNow} dari ${total} kotak. Semua benar, hebat! 🎉</p>`;
+      } else if(attempts<LATIHAN_MAX_PERCOBAAN){
+        html += `<p class="status-msg" style="margin-top:8px;color:var(--amber-text);background:var(--amber-bg);border:1px solid #f0dca0;padding:9px 13px;border-radius:8px;font-size:13px">⏳ Percobaan ke-${attempts} dari ${LATIHAN_MAX_PERCOBAAN} — benar ${benarNow} dari ${total} kotak. Perbaiki kotak yang belum hijau, lalu tekan tombol Cek lagi.</p>`;
+      } else {
+        html += `<p class="status-msg ok" style="margin-top:8px">✓ ${g.label}: benar ${benarNow} dari ${total} kotak. Sudah 3 kali percobaan — lihat catatan jawaban di setiap nomor yang masih salah.</p>`;
+      }
+      if(!allCorrect) html += `<button class="btn-2" id="${g.btn}-reset" style="margin-top:8px">↻ Ulangi ${g.label} dari awal</button>`;
     }
     html += `</div>`;
   });
   return html;
 }
 function checkLatihanGroup(g){
-  answers[g.key] = true; saveAnswers();
+  const attempts = (answers[g.key+'Attempts']||0) + 1;
+  answers[g.key+'Attempts'] = attempts;
+  answers[g.key] = true;
+  saveAnswers();
   const total=(g.to-g.from)*2; let benar=0;
   for(let i=g.from;i<g.to;i++){ const v=(answers.latihan||[])[i]||['','']; const soal=latihanSoal[i];
     if(String(v[0]).trim()===String(soal.jawaban[0])) benar++;
     if(String(v[1]).trim()===String(soal.jawaban[1])) benar++; }
   if(benar===total){ celebrate(); showToast(g.label+': semua benar! 🎉'); }
-  else if(benar>=Math.ceil(total*0.7)){ showToast(g.label+`: benar ${benar}/${total}`); }
+  else if(attempts>=LATIHAN_MAX_PERCOBAAN){ showToast(g.label+`: benar ${benar}/${total}. Catatan jawaban sudah ditampilkan.`); }
+  else { showToast(g.label+`: benar ${benar}/${total}. Percobaan ${attempts}/${LATIHAN_MAX_PERCOBAAN} — coba lagi!`); }
   render(3);
+}
+function resetLatihanGroup(g){
+  answers.latihan = answers.latihan || [];
+  for(let i=g.from;i<g.to;i++){ answers.latihan[i] = ['','']; }
+  answers[g.key] = false;
+  answers[g.key+'Attempts'] = 0;
+  saveAnswers(); render(3);
 }
 
 const materiSlides = [
@@ -1091,9 +1124,7 @@ function screenDone(idx){
 }
 /* Asesmen (6) & Refleksi (7) hanya bisa dikerjakan secara berurutan */
 function canAccess(idx){
-  if(idx===6) return [0,1,2,3,4,5].every(screenDone);   // wajib selesai semua tahap belajar dulu
-  if(idx===7) return screenDone(6);                     // Refleksi butuh Asesmen selesai
-  return true;
+  return true; // semua layar bebas diakses kapan saja, tidak wajib berurutan
 }
 function firstIncomplete(list){ for(const k of list){ if(!screenDone(k)) return k; } return list[0]; }
 function lockedHTML(idx){
@@ -1367,12 +1398,18 @@ function renderQuizJodoh(){
   const done = !!answers.jodohDone;
   let html = `<p style="font-size:16px;font-weight:700;margin:0 0 10px">Pasangkan tiap barisan dengan aturan polanya:</p>`;
   jodohSoal.forEach((s,i)=>{
-    let cls=''; if(done){ cls=(ans[i]===s.aturan)?'lat-correct':'lat-wrong'; }
-    html += `<div class="jodoh-row"><span class="jodoh-bar">${s.barisan}</span>
+    let cls=''; let hint='';
+    if(done){
+      if(!ans[i]) cls='lat-empty';
+      else if(ans[i]===s.aturan) cls='lat-correct';
+      else { cls='lat-wrong'; hint=`<div class="lat-answer-hint">✗ Belum tepat. Jawaban yang benar: <b>${s.aturan}</b></div>`; }
+      if(!ans[i]) hint=`<div class="lat-answer-hint">✏️ Belum dipilih. Jawaban yang benar: <b>${s.aturan}</b></div>`;
+    }
+    html += `<div class="lat-row-wrap"><div class="jodoh-row"><span class="jodoh-bar">${s.barisan}</span>
       <select class="jodoh-sel ${cls}" data-i="${i}" ${done?'disabled':''}>
         <option value="">— pilih —</option>
         ${jodohOptions.map(o=>`<option value="${o}" ${ans[i]===o?'selected':''}>${o}</option>`).join('')}
-      </select></div>`;
+      </select></div>${hint}</div>`;
   });
   if(!done){ html += `<button class="btn-primary" id="jodoh-check" style="margin-top:12px">Cek jawaban</button>`; }
   else {
@@ -1646,7 +1683,6 @@ function render(i){
   document.getElementById('url-bar').innerHTML = 'Pola Bilangan <span class="crumb-sep">›</span> ' + escapeHtml(s.url);
   document.getElementById('screen-body').innerHTML = locked ? lockedHTML(i) : s.body();
   document.getElementById('notes-text').textContent = s.note;
-  document.getElementById('criteria-text').innerHTML = (s.criteria || []).map(c => `<span class="pill">✓ ${escapeHtml(c)}</span>`).join('');
   [...tabsEl.children].forEach((b,idx)=>{
     b.classList.toggle('active', idx===i);
     const done = screenDone(idx);
@@ -1712,12 +1748,15 @@ function attachHandlers(i){
         const idx=parseInt(inp.dataset.i,10), k=parseInt(inp.dataset.k,10);
         answers.latihan[idx] = answers.latihan[idx] || ['',''];
         answers.latihan[idx][k] = inp.value;
+        // Mengetik ulang menyembunyikan warna sementara (supaya tidak basi), TAPI jumlah percobaan tetap tersimpan
         if(idx<5) answers.latihanChecked1=false; else answers.latihanChecked2=false;
         saveAnswers();
       }); });
       latihanGroups.forEach(g=>{
         const cb=document.getElementById(g.btn);
         if(cb) cb.addEventListener('click', ()=> checkLatihanGroup(g));
+        const rb=document.getElementById(g.btn+'-reset');
+        if(rb) rb.addEventListener('click', ()=> resetLatihanGroup(g));
       });
     }
     if(materiMode==='video'){
