@@ -364,14 +364,6 @@
   .score-box .num{font-size:42px;font-weight:700;color:var(--green-text);margin:0;line-height:1;}
   .score-box .lbl{font-size:12px;color:var(--green-text);margin:6px 0 0;font-weight:500;letter-spacing:.6px;text-transform:uppercase;}
 
-  /* ====== DISKUSI ====== */
-  .disc-msg{display:flex;gap:10px;margin-bottom:12px;}
-  .disc-av{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;}
-  .disc-body{background:#f8f9fa;border:1px solid var(--border);border-radius:10px;padding:8px 12px;flex:1;min-width:0;}
-  .disc-name{font-size:12px;font-weight:700;color:var(--text);margin:0 0 2px;}
-  .disc-text{font-size:14px;margin:0;color:var(--text);word-wrap:break-word;}
-  .disc-msg.teacher .disc-body{background:var(--green-bg);border-color:#ceead6;}
-
   /* ====== GERBANG (login) ====== */
   #gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:transparent;position:relative;z-index:1;}
   .gate-card{
@@ -497,6 +489,10 @@
   input.lat-input.lat-correct{border-color:var(--green);background:var(--green-bg);color:var(--green-text);}
   input.lat-input.lat-wrong{border-color:var(--red);background:var(--red-bg);color:var(--red);}
   input.lat-input.lat-empty{border-color:var(--amber);background:var(--amber-bg);color:var(--amber-text);}
+  .lat-mark{flex-shrink:0;width:18px;text-align:center;font-size:16px;font-weight:800;line-height:1;}
+  .lat-mark.lat-correct{color:var(--green);}
+  .lat-mark.lat-wrong{color:var(--red);}
+  .lat-mark.lat-empty{color:var(--amber);}
   .lat-row-wrap{border-bottom:1px solid #f1f3f4;}
   .lat-row-wrap .lat-row{border-bottom:none;padding-bottom:4px;}
   .lat-answer-hint{font-size:12.5px;color:var(--red);background:var(--red-bg);border-radius:8px;padding:6px 10px;margin:0 0 10px;}
@@ -625,7 +621,7 @@
       </div>
       <div class="appbar-right">
         <button id="keluar-btn" class="keluar-chip" title="Keluar dari kelas">🚪 Keluar</button>
-        <span class="counter" id="screen-counter">Layar 1 / 8</span>
+        <span class="counter" id="screen-counter">Layar 1 / 7</span>
       </div>
     </div>
 
@@ -767,7 +763,6 @@ function saveAnswers(){
     try{
       const slim = JSON.parse(JSON.stringify(answers));
       slim.lampiran = [];
-      if(Array.isArray(slim.diskusiPosts)) slim.diskusiPosts = slim.diskusiPosts.map(p => (typeof p==='string') ? p : {text:(p.text||'')});
       localStorage.setItem('lms_answers', JSON.stringify(slim));
       showToast('Penyimpanan penuh — teks tersimpan, lampiran hanya untuk sesi ini.');
     }catch(e2){}
@@ -833,12 +828,6 @@ const screens = [
     body: () => renderAktivitas()
   },
   {
-    title: "Diskusi", icon: "💬", url: "Diskusi / Interaksi",
-    note: "Berbagi pola — bisa lewat teks, suara, atau foto.",
-    criteria: ["Pilihan cara berinteraksi: teks / suara / foto", "Guru memoderasi & memberi feedback"],
-    body: () => renderDiskusi()
-  },
-  {
     title: "Asesmen", icon: "📝", url: "Asesmen",
     note: "Jawab 5 soal. Skormu dihitung otomatis.",
     criteria: ["Beragam bentuk asesmen (bukan esai 1.500 kata)", "Asesmen mengukur kompetensi yang dituju"],
@@ -901,9 +890,11 @@ function renderLatihan(){
           hint = `<div class="lat-answer-hint">${kosong1||kosong2?'✏️ Belum lengkap.':'✗ Belum tepat.'} Jawaban yang benar: <b>${soal.jawaban[0]}</b> dan <b>${soal.jawaban[1]}</b></div>`;
         }
       }
+      const mark1 = shown ? (cls1==='lat-correct'?'✓':cls1==='lat-wrong'?'✗':'?') : '';
+      const mark2 = shown ? (cls2==='lat-correct'?'✓':cls2==='lat-wrong'?'✗':'?') : '';
       html += `<div class="lat-row-wrap"><div class="lat-row"><span class="lat-no">${i+1}.</span><span class="lat-pola">${soal.pola.replace(/___/g,'<b>…</b>')}</span>
-        <input type="text" inputmode="numeric" class="lat-input ${cls1}" data-i="${i}" data-k="0" value="${escapeHtml(v[0])}" placeholder="…">
-        <input type="text" inputmode="numeric" class="lat-input ${cls2}" data-i="${i}" data-k="1" value="${escapeHtml(v[1])}" placeholder="…"></div>${hint}</div>`;
+        <input type="text" inputmode="numeric" class="lat-input ${cls1}" data-i="${i}" data-k="0" value="${escapeHtml(v[0])}" placeholder="…"><span class="lat-mark ${cls1}">${mark1}</span>
+        <input type="text" inputmode="numeric" class="lat-input ${cls2}" data-i="${i}" data-k="1" value="${escapeHtml(v[1])}" placeholder="…"><span class="lat-mark ${cls2}">${mark2}</span></div>${hint}</div>`;
     }
     let btnLabel;
     if(attempts===0) btnLabel = `Cek jawaban ${g.label}`;
@@ -1117,23 +1108,22 @@ function screenDone(idx){
   if(idx<=2) return !!(answers.seen && answers.seen[idx]);   // Beranda, Petunjuk, Tujuan (sudah dibaca)
   if(idx===3) return !!answers.materiDone;
   if(idx===4) return !!(answers.aktivitas || answers.aktivitas2);
-  if(idx===5) return !!answers.diskusi;
-  if(idx===6) return !!answers.quizDone;
-  if(idx===7) return !!answers.submitted;
+  if(idx===5) return !!answers.quizDone;
+  if(idx===6) return !!answers.submitted;
   return false;
 }
-/* Asesmen (6) & Refleksi (7) hanya bisa dikerjakan secara berurutan */
+/* Asesmen (5) & Refleksi (6) hanya bisa dikerjakan secara berurutan */
 function canAccess(idx){
   return true; // semua layar bebas diakses kapan saja, tidak wajib berurutan
 }
 function firstIncomplete(list){ for(const k of list){ if(!screenDone(k)) return k; } return list[0]; }
 function lockedHTML(idx){
-  if(idx===6){
-    const go = firstIncomplete([0,1,2,3,4,5]);
+  if(idx===5){
+    const go = firstIncomplete([0,1,2,3,4]);
     return `<div class="locked-box">
       <div class="locked-ico">🔒</div>
       <h2>Asesmen masih terkunci</h2>
-      <p>Selesaikan dulu semua tahap belajar secara berurutan: <b>Beranda → Petunjuk → Tujuan → Materi → Aktivitas → Diskusi</b>.</p>
+      <p>Selesaikan dulu semua tahap belajar secara berurutan: <b>Beranda → Petunjuk → Tujuan → Materi → Aktivitas</b>.</p>
       <button class="btn-primary" id="locked-go" data-goto="${go}">Lanjut ke ${escapeHtml(screens[go].title)} →</button>
     </div>`;
   }
@@ -1141,15 +1131,14 @@ function lockedHTML(idx){
     <div class="locked-ico">🔒</div>
     <h2>Refleksi masih terkunci</h2>
     <p>Kerjakan dan kirim dulu <b>Asesmen</b>, baru Refleksi bisa dibuka.</p>
-    <button class="btn-primary" id="locked-go" data-goto="6">Ke Asesmen →</button>
+    <button class="btn-primary" id="locked-go" data-goto="5">Ke Asesmen →</button>
   </div>`;
 }
 function resumeTarget(){
   if(!answers.materiDone) return 3;
   if(!answers.aktivitas) return 4;
-  if(!answers.diskusi) return 5;
-  if(!answers.quizDone) return 6;
-  if(!answers.submitted) return 7;
+  if(!answers.quizDone) return 5;
+  if(!answers.submitted) return 6;
   return 1;
 }
 
@@ -1292,32 +1281,6 @@ function renderAktivitas(){
     html += `<button class="btn-2" id="akt-reset" style="margin-top:8px">↻ Ulangi aktivitas ini</button>`;
     if(isAngka && !answers.aktivitas2) html += `<p style="font-size:14px;margin-top:10px">Lanjut ke <b>Aktivitas 2 · Pola Gambar</b> di atas ya! 🖼️</p>`;
   }
-  return html;
-}
-
-/* ====== DISKUSI ====== */
-const diskusiThread = [
-  {who:'Dina', ini:'D', color:'#1a73e8', text:'Polaku: 5, 10, 15, 20. Coba tebak aturannya!'},
-  {who:'Bagas (🎤 pesan suara)', ini:'B', color:'#e8710a', text:'Gampang, +5! Kalau punyaku: 1, 4, 9, 16?'},
-  {who:'Ibu Guru', ini:'G', color:'#1e8e3e', text:'Menarik! Itu pola bilangan kuadrat. Bagus sekali. 👍', teacher:true}
-];
-function renderDiskusi(){
-  const posts = answers.diskusiPosts || [];
-  let html = `<h2>Diskusi / Interaksi</h2><p class="desc">Berbagi pola — bisa lewat teks, suara, atau foto</p>`;
-  html += `<div class="box" style="font-size:14px">Pertanyaan diskusi: buat satu pola bilanganmu sendiri, lalu tantang temanmu menebak aturannya. Tanggapi dengan sopan. 🙂</div>`;
-  const mine = posts.map(p=>{ const o=(typeof p==='string')?{text:p}:p; return {who:(studentName||'Kamu'), ini:(studentName||'K').charAt(0).toUpperCase(), color:'#9334e6', text:o.text||'', photo:o.photo||'', audio:o.audio||''}; });
-  const all = diskusiThread.concat(mine);
-  html += all.map(m=>{
-    let media='';
-    if(m.photo) media+=`<img src="${m.photo}" alt="foto pola" style="margin-top:6px;max-height:130px;border-radius:8px;border:1px solid var(--border);display:block">`;
-    if(m.audio) media+=`<audio controls src="${m.audio}" style="margin-top:6px;height:36px;display:block;max-width:100%"></audio>`;
-    const txt = m.text ? `<p class="disc-text">${escapeHtml(m.text)}</p>` : '';
-    return `<div class="disc-msg ${m.teacher?'teacher':''}"><div class="disc-av" style="background:${m.color}">${escapeHtml(m.ini)}</div><div class="disc-body"><p class="disc-name">${escapeHtml(m.who)}</p>${txt}${media}</div></div>`;
-  }).join('');
-  html += modalityHTML('diskusi-input');
-  html += `<textarea id="diskusi-input" placeholder="Tulis tanggapan atau pola bilanganmu…">${escapeHtml(answers.diskusiDraft || '')}</textarea>`;
-  html += `<button class="btn-primary" id="diskusi-submit">Kirim ke diskusi</button>`;
-  html += `<p class="status-msg ok" id="diskusi-status">${answers.diskusiFeedback || ''}</p>`;
   return html;
 }
 
@@ -1491,7 +1454,6 @@ const mascotTipsID = [
   "Ini target belajarmu hari ini. Tetap semangat!",
   "Pilih cara belajarmu: teks, visual, atau video.",
   "Coba tebak sendiri dahulu sebelum melihat bantuan.",
-  "Bagikan polamu dan tanggapi temanmu dengan sopan.",
   "Kerjakan tiap soal dengan teliti, satu per satu.",
   "Lihat umpan balik, lalu isi dan kirim refleksimu."
 ];
@@ -1502,7 +1464,6 @@ const mascotTipsDaerah = [
   "Inilah tujuan belajarmu hari ini. Teruslah bersemangat!",
   "Pilihlah cara belajarmu: teks, gambar, atau video.",
   "Cubalah teka sendiri dahulu sebelum melihat bantuan.",
-  "Kongsikan polamu dan tanggapilah kawanmu dengan sopan.",
   "Kerjakanlah tiap soalan dengan teliti, satu demi satu.",
   "Lihatlah maklum balas, lalu isi dan hantar refleksimu."
 ];
@@ -1516,7 +1477,6 @@ function updateMascot(i){
 const badgeDefs = [
   { id:'materiDone', ico:'📖', lbl:'Penjelajah' },
   { id:'aktivitas',  ico:'🔍', lbl:'Penyelidik' },
-  { id:'diskusi',    ico:'💬', lbl:'Berbagi' },
   { id:'quizDone',   ico:'🏅', lbl:'Tuntas' },
   { id:'submitted',  ico:'🌟', lbl:'Reflektif' }
 ];
@@ -1679,7 +1639,7 @@ function render(i){
   // Tandai Beranda/Petunjuk/Tujuan sebagai sudah dibaca saat dibuka
   if(i<=2){ answers.seen = answers.seen || {}; if(!answers.seen[i]){ answers.seen[i]=true; saveAnswers(); } }
   const locked = !canAccess(i);
-  document.getElementById('screen-counter').textContent = `Layar ${i+1} / 8`;
+  document.getElementById('screen-counter').textContent = `Layar ${i+1} / ${screens.length}`;
   document.getElementById('url-bar').innerHTML = 'Pola Bilangan <span class="crumb-sep">›</span> ' + escapeHtml(s.url);
   document.getElementById('screen-body').innerHTML = locked ? lockedHTML(i) : s.body();
   document.getElementById('notes-text').textContent = s.note;
@@ -1862,50 +1822,31 @@ function attachHandlers(i){
     }
   }
   if(i===5){
-    attachModality('diskusi-input');
-    const ta=document.getElementById('diskusi-input');
-    if(ta) ta.addEventListener('input', ()=>{ answers.diskusiDraft = ta.value; saveAnswers(); });
-    const db=document.getElementById('diskusi-submit');
-    if(db) db.addEventListener('click', ()=>{
-      const v=(document.getElementById('diskusi-input').value||'').trim();
-      const a=mediaAttach['diskusi-input']||{};
-      if(!v && !a.photo && !a.audio) return;
-      if(a.photo) pushLampiran('foto','diskusi',a.photo);
-      if(a.audio) pushLampiran('suara','diskusi',a.audio);
-      const post={text:v||'', photo:a.photo||'', audio:a.audio||''};
-      mediaAttach['diskusi-input']={};
-      answers.diskusiPosts = answers.diskusiPosts || [];
-      answers.diskusiPosts.push(post);
-      answers.diskusi = v || (a.photo?'📷 foto':'🎤 suara'); answers.diskusiDraft=''; answers.diskusiFeedback='✓ Tanggapanmu terkirim ke diskusi kelas.';
-      saveAnswers(); renderBadges(); showToast('Terkirim ke diskusi!'); render(5);
-    });
-  }
-  if(i===6){
-    document.querySelectorAll('[data-as]').forEach(ch=>ch.addEventListener('click',()=>{ asMode=ch.dataset.as; localStorage.setItem('lms_as_mode',asMode); render(6); }));
+    document.querySelectorAll('[data-as]').forEach(ch=>ch.addEventListener('click',()=>{ asMode=ch.dataset.as; localStorage.setItem('lms_as_mode',asMode); render(5); }));
     if(asMode==='tertulis'){
       document.querySelectorAll('.quiz-opt').forEach(btn=>{ btn.addEventListener('click', ()=>{
         answers.quizAnswers = answers.quizAnswers || [];
         answers.quizAnswers[quizIdx] = parseInt(btn.dataset.o,10);
-        saveAnswers(); render(6);
+        saveAnswers(); render(5);
       }); });
-      const qp=document.getElementById('q-prev'); if(qp) qp.addEventListener('click', ()=>{ if(quizIdx>0){ quizIdx--; localStorage.setItem('lms_quiz_idx',quizIdx); render(6); } });
-      const qn=document.getElementById('q-next'); if(qn) qn.addEventListener('click', ()=>{ if(quizIdx<quiz.length-1){ quizIdx++; localStorage.setItem('lms_quiz_idx',quizIdx); render(6); } });
+      const qp=document.getElementById('q-prev'); if(qp) qp.addEventListener('click', ()=>{ if(quizIdx>0){ quizIdx--; localStorage.setItem('lms_quiz_idx',quizIdx); render(5); } });
+      const qn=document.getElementById('q-next'); if(qn) qn.addEventListener('click', ()=>{ if(quizIdx<quiz.length-1){ quizIdx++; localStorage.setItem('lms_quiz_idx',quizIdx); render(5); } });
       const sb=document.getElementById('quiz-submit');
       if(sb) sb.addEventListener('click', ()=>{
         const sel=answers.quizAnswers||[]; let correct=0; quiz.forEach((q,idx)=>{ if(sel[idx]===q.correct) correct++; });
         answers.score=Math.round(correct/quiz.length*100); answers.quizDone=true; saveAnswers(); renderBadges();
         if(answers.score>=80) celebrate();
-        render(6);
+        render(5);
       });
-      const rt=document.getElementById('quiz-retry'); if(rt) rt.addEventListener('click', ()=>{ answers.quizAnswers=[]; answers.quizDone=false; answers.showPembahasan=false; delete answers.score; quizIdx=0; localStorage.setItem('lms_quiz_idx',0); saveAnswers(); render(6); });
-      const rv=document.getElementById('quiz-review'); if(rv) rv.addEventListener('click', ()=>{ answers.showPembahasan=!answers.showPembahasan; saveAnswers(); render(6); });
+      const rt=document.getElementById('quiz-retry'); if(rt) rt.addEventListener('click', ()=>{ answers.quizAnswers=[]; answers.quizDone=false; answers.showPembahasan=false; delete answers.score; quizIdx=0; localStorage.setItem('lms_quiz_idx',0); saveAnswers(); render(5); });
+      const rv=document.getElementById('quiz-review'); if(rv) rv.addEventListener('click', ()=>{ answers.showPembahasan=!answers.showPembahasan; saveAnswers(); render(5); });
     } else if(asMode==='jodoh'){
       document.querySelectorAll('.jodoh-sel').forEach(sel=>sel.addEventListener('change',()=>{ answers.jodohAns=answers.jodohAns||{}; answers.jodohAns[sel.dataset.i]=sel.value; saveAnswers(); }));
       const jc=document.getElementById('jodoh-check'); if(jc) jc.addEventListener('click',()=>{
         answers.jodohAns=answers.jodohAns||{}; let benar=0; jodohSoal.forEach((s,idx)=>{ if(answers.jodohAns[idx]===s.aturan) benar++; });
-        answers.jodohDone=true; saveAnswers(); if(benar===jodohSoal.length) celebrate(); showToast(`Benar ${benar}/${jodohSoal.length}`); render(6);
+        answers.jodohDone=true; saveAnswers(); if(benar===jodohSoal.length) celebrate(); showToast(`Benar ${benar}/${jodohSoal.length}`); render(5);
       });
-      const jr=document.getElementById('jodoh-retry'); if(jr) jr.addEventListener('click',()=>{ answers.jodohAns={}; answers.jodohDone=false; saveAnswers(); render(6); });
+      const jr=document.getElementById('jodoh-retry'); if(jr) jr.addEventListener('click',()=>{ answers.jodohAns={}; answers.jodohDone=false; saveAnswers(); render(5); });
     } else if(asMode==='lisan'){
       attachModality('lisan-input');
       const ls=document.getElementById('lisan-send'); if(ls) ls.addEventListener('click',()=>{
@@ -1913,24 +1854,24 @@ function attachHandlers(i){
         if(!a.audio && !a.photo && !t){ showToast('Rekam suaramu atau tulis jawaban dulu ya.'); return; }
         if(a.audio) pushLampiran('suara','asesmen-lisan',a.audio);
         if(a.photo) pushLampiran('foto','asesmen-lisan',a.photo);
-        answers.lisanJawab=t; answers.lisanDone=true; mediaAttach['lisan-input']={}; saveAnswers(); showToast('Jawaban lisan terkirim ✓'); render(6);
+        answers.lisanJawab=t; answers.lisanDone=true; mediaAttach['lisan-input']={}; saveAnswers(); showToast('Jawaban lisan terkirim ✓'); render(5);
       });
-      const lr=document.getElementById('lisan-retry'); if(lr) lr.addEventListener('click',()=>{ answers.lisanDone=false; saveAnswers(); render(6); });
+      const lr=document.getElementById('lisan-retry'); if(lr) lr.addEventListener('click',()=>{ answers.lisanDone=false; saveAnswers(); render(5); });
     } else if(asMode==='foto'){
       attachModality('foto-input');
       const fsn=document.getElementById('foto-send'); if(fsn) fsn.addEventListener('click',()=>{
         const a=mediaAttach['foto-input']||{};
         if(!a.photo){ showToast('Unggah/foto dulu hasil coretanmu ya.'); return; }
-        pushLampiran('foto','asesmen-foto',a.photo); answers.fotoDone=true; mediaAttach['foto-input']={}; saveAnswers(); showToast('Foto terkirim ✓'); render(6);
+        pushLampiran('foto','asesmen-foto',a.photo); answers.fotoDone=true; mediaAttach['foto-input']={}; saveAnswers(); showToast('Foto terkirim ✓'); render(5);
       });
-      const fr=document.getElementById('foto-retry'); if(fr) fr.addEventListener('click',()=>{ answers.fotoDone=false; saveAnswers(); render(6); });
+      const fr=document.getElementById('foto-retry'); if(fr) fr.addEventListener('click',()=>{ answers.fotoDone=false; saveAnswers(); render(5); });
     }
   }
-  if(i===7){
+  if(i===6){
     attachModality('refl');
-    const rg=document.getElementById('refl-go'); if(rg) rg.addEventListener('click', ()=> render(6));
-    const rr=document.getElementById('refl-retry'); if(rr) rr.addEventListener('click', ()=>{ answers.quizAnswers=[]; answers.quizDone=false; answers.showPembahasan=false; delete answers.score; quizIdx=0; localStorage.setItem('lms_quiz_idx',0); saveAnswers(); render(6); });
-    const rp=document.getElementById('refl-review'); if(rp) rp.addEventListener('click', ()=>{ answers.showPembahasan=true; saveAnswers(); render(6); });
+    const rg=document.getElementById('refl-go'); if(rg) rg.addEventListener('click', ()=> render(5));
+    const rr=document.getElementById('refl-retry'); if(rr) rr.addEventListener('click', ()=>{ answers.quizAnswers=[]; answers.quizDone=false; answers.showPembahasan=false; delete answers.score; quizIdx=0; localStorage.setItem('lms_quiz_idx',0); saveAnswers(); render(5); });
+    const rp=document.getElementById('refl-review'); if(rp) rp.addEventListener('click', ()=>{ answers.showPembahasan=true; saveAnswers(); render(5); });
     document.querySelectorAll('.refleksi-input').forEach(tx=>{ tx.addEventListener('input', ()=>{
       answers.refleksi = answers.refleksi || ['','',''];
       answers.refleksi[parseInt(tx.dataset.idx)] = tx.value; saveAnswers();
@@ -1962,8 +1903,8 @@ async function exportResult(){
   answers.refleksi = answers.refleksi || ['','',''];
   document.querySelectorAll('.refleksi-input').forEach(tx=>{ answers.refleksi[parseInt(tx.dataset.idx)] = tx.value; });
   const lamp = answers.lampiran || [];
-  // Kelompokkan lampiran berdasarkan menu (sumber): aktivitas, diskusi, refleksi, asesmen
-  const menuLabel = { aktivitas1:'Aktivitas', aktivitas2:'Aktivitas', aktivitas:'Aktivitas', diskusi:'Diskusi', refleksi:'Refleksi', 'asesmen-foto':'Asesmen', 'asesmen-lisan':'Asesmen', asesmen:'Asesmen' };
+  // Kelompokkan lampiran berdasarkan menu (sumber): aktivitas, refleksi, asesmen
+  const menuLabel = { aktivitas1:'Aktivitas', aktivitas2:'Aktivitas', aktivitas:'Aktivitas', refleksi:'Refleksi', 'asesmen-foto':'Asesmen', 'asesmen-lisan':'Asesmen', asesmen:'Asesmen' };
   const groups = {};
   lamp.forEach(a=>{ const key = menuLabel[a.sumber] || (a.sumber ? a.sumber.charAt(0).toUpperCase()+a.sumber.slice(1) : 'Lainnya'); (groups[key]=groups[key]||[]).push(a); });
   let lampiranHTML = '';
@@ -2001,7 +1942,6 @@ async function exportResult(){
   <h2>Ringkasan</h2>
   <p class="kv"><b>Skor asesmen:</b> ${answers.score ?? '-'} / 100</p>
   <p class="kv"><b>Jawaban aktivitas:</b></p><div class="box">${escapeHtml(answers.aktivitas || '-')}</div>
-  <p class="kv"><b>Jawaban diskusi:</b></p><div class="box">${escapeHtml(diskusiText() || '-')}</div>
   <h2>Refleksi</h2>
   <p class="kv"><b>1. Pola apa yang paling mudah kamu pahami?</b></p><div class="box">${escapeHtml(answers.refleksi[0] || '-')}</div>
   <p class="kv"><b>2. Bagian mana yang masih membingungkan?</b></p><div class="box">${escapeHtml(answers.refleksi[1] || '-')}</div>
@@ -2038,8 +1978,6 @@ async function exportResult(){
   showToast('Hasil belajar tersimpan (foto ikut tertanam).');
 }
 
-function diskusiText(){ return (answers.diskusiPosts||[]).map(p => (typeof p==='string') ? p : (p.text || '[lampiran]')).join(' | '); }
-
 function saveRefleksi(){
   answers.refleksi = answers.refleksi || ['','',''];
   document.querySelectorAll('.refleksi-input').forEach(tx=>{ answers.refleksi[parseInt(tx.dataset.idx)] = tx.value; });
@@ -2060,7 +1998,6 @@ async function submitFinal(){
   const payload = {
     nama: studentName, waktu: new Date().toISOString(),
     jawabanAktivitas: answers.aktivitas || '',
-    jawabanDiskusi: diskusiText(),
     skorAsesmen: answers.score ?? '',
     refleksi1: answers.refleksi[0] || '', refleksi2: answers.refleksi[1] || '', refleksi3: answers.refleksi[2] || '',
     lampiran: (answers.lampiran || []).slice(-12)
