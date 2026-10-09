@@ -515,6 +515,16 @@
 
   .screen-body ul{padding-left:20px;}
 
+  .inq-steps{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:0 0 12px;}
+  .inq-chip{font-size:12px;padding:5px 10px;border-radius:14px;background:#eef1f5;color:var(--muted);font-weight:700;}
+  .inq-chip.done{background:var(--green-bg,#e6f4ea);color:var(--green,#1e8e3e);}
+  .inq-chip.now{background:var(--blue);color:#fff;}
+  .dev-btn{background:none;border:none;color:var(--blue);font:inherit;font-weight:700;cursor:pointer;text-decoration:underline;padding:4px 8px;}
+  .dev-btn:hover{color:var(--blue-dark);}
+  .dev-info{display:block;width:fit-content;max-width:100%;text-align:left;margin:8px auto 8px;padding:12px 18px;background:var(--blue-bg);border-radius:12px;color:var(--text,#202124);font-size:13px;line-height:1.6;}
+  .dev-info[hidden]{display:none;}
+  .dev-info p{margin:0 0 4px;} .dev-info .dev-title{font-weight:700;color:var(--blue-dark);}
+  .dev-info ul{margin:0 0 6px;padding-left:20px;}
   footer{text-align:center;font-size:12px;color:var(--muted);max-width:1040px;margin:24px auto;padding:16px 20px 30px;border-top:1px solid var(--border);line-height:1.7;}
 
   /* ====== TOAST & KONFETI ====== */
@@ -671,13 +681,26 @@
     </div>
 
     <footer>
-      LMS Pola Bilangan — Unit Pembelajaran Matematika SD · Berbasis desain inklusif dan aksesibilitas<br>
-      Disusun oleh: Kelompok 6 (Parahat, Anton, Dina, Dwi) · Magister Teknologi Pendidikan, FKIP Untan<br>
-      Jawaban dan skor tersimpan otomatis.
+      <button type="button" id="dev-btn" class="dev-btn" aria-expanded="false" aria-controls="dev-info">Pengembang</button>
+      <div id="dev-info" class="dev-info" hidden>
+        <p class="dev-title">Tim Pengembang LMS Berbasis UDL:</p>
+        <ul>
+          <li>Risdianto Parahat</li>
+          <li>Antonius Tukimin</li>
+          <li>Dwi Sudarti</li>
+          <li>Dina Kurniawati</li>
+        </ul>
+        <p>Magister Teknologi Pendidikan<br>Universitas Tanjungpura<br>2026</p>
+      </div>
     </footer>
   </div>
 
 <script>
+
+document.getElementById('dev-btn').addEventListener('click', function(){
+  const p=document.getElementById('dev-info'); const open=p.hidden;
+  p.hidden=!open; this.setAttribute('aria-expanded', open?'true':'false');
+});
 /* ====== KONFIGURASI ====== */
 const GAS_URL = "https://script.google.com/macros/s/AKfycbzxyRymHmi2OekgEXEwpeWNcWgyj8kF97221eyBkcUHJuc54-8-8rW1feKpW4QQ0Sg8Ww/exec";
 
@@ -1233,14 +1256,19 @@ function pushLampiran(jenis, sumber, data){
 
 /* ====== AKTIVITAS (guided inquiry) ====== */
 const aktSteps1 = [
+  { bot:"Sebelum menghitung, coba tebak dulu: menurutmu, apa aturan pola 3, 6, 9, 12? Tulis tebakanmu (boleh salah, ini baru dugaan).", check:v=>v.trim().length>=1, ok:"Tebakan yang bagus! Sekarang kita buktikan dengan menghitung.", hint:"Tulis saja dugaanmu, misalnya: bertambah …" },
   { bot:"Perhatikan barisan bilangan di atas: 3, 6, 9, 12. Berapa banyak bilangan bertambah setiap langkah?", check:v=>/\b3\b/.test(v.replace(/[^0-9]/g,' ')), ok:"Betul! Bertambah 3 setiap langkah.", hint:"Coba hitung 6 dikurangi 3, atau 9 dikurangi 6." },
-  { bot:"Kalau pola +3 ini kita lanjutkan setelah angka 12, berapakah bilangan berikutnya?", check:v=>/\b15\b/.test(v.replace(/[^0-9]/g,' ')), ok:"Benar! Karena aturannya +3, maka 12 + 3 = 15.", hint:"12 ditambah 3 sama dengan berapa?" }
+  { bot:"Kalau pola +3 ini kita lanjutkan setelah angka 12, berapakah bilangan berikutnya?", check:v=>/\b15\b/.test(v.replace(/[^0-9]/g,' ')), ok:"Benar! Karena aturannya +3, maka 12 + 3 = 15.", hint:"12 ditambah 3 sama dengan berapa?" },
+  { bot:"Kesimpulan: tuliskan aturan pola 3, 6, 9, 12 dengan kalimatmu sendiri. Mulai dengan: \"Bilangannya …\"", check:v=>v.trim().length>=5, ok:"Mantap! Aturan polanya: bertambah 3 setiap langkah. Kamu menemukannya sendiri! 🎉", hint:"Tulis satu kalimat lengkap, misalnya: Bilangannya bertambah … setiap langkah." }
 ];
 const aktSteps2 = [
+  { bot:"Sebelum menghitung, lihat gambar biji karet di atas. Menurutmu, bagaimana jumlah biji karet berubah dari baris ke baris? Tulis tebakanmu (boleh salah, ini baru dugaan).", check:v=>v.trim().length>=1, ok:"Tebakan yang bagus! Sekarang kita buktikan dengan menghitung.", hint:"Tulis saja dugaanmu, misalnya: bertambah …" },
   { bot:"Perhatikan pola biji karet pada gambar di atas: baris ke-1 berisi 2 biji, baris ke-2 berisi 4 biji, dan baris ke-3 berisi 6 biji. Berapa banyak biji karet bertambah tiap baris?", check:v=>/\b2\b/.test(v.replace(/[^0-9]/g,' ')), ok:"Betul! Bertambah 2 biji karet setiap baris.", hint:"Coba hitung 4 dikurangi 2, atau 6 dikurangi 4." },
-  { bot:"Kalau pola +2 ini kita lanjutkan, berapa banyak biji karet pada baris ke-4?", check:v=>/\b8\b/.test(v.replace(/[^0-9]/g,' ')), ok:"Benar! Karena aturannya +2, maka 6 + 2 = 8.", hint:"6 ditambah 2 sama dengan berapa?" }
+  { bot:"Kalau pola +2 ini kita lanjutkan, berapa banyak biji karet pada baris ke-4?", check:v=>/\b8\b/.test(v.replace(/[^0-9]/g,' ')), ok:"Benar! Karena aturannya +2, maka 6 + 2 = 8.", hint:"6 ditambah 2 sama dengan berapa?" },
+  { bot:"Kesimpulan: tuliskan aturan pola biji karet dengan kalimatmu sendiri. Mulai dengan: \"Biji karetnya …\"", check:v=>v.trim().length>=5, ok:"Mantap! Aturan polanya: bertambah 2 biji karet setiap baris. Kamu menemukannya sendiri! 🎉", hint:"Tulis satu kalimat lengkap, misalnya: Biji karetnya bertambah … setiap baris." }
 ];
 function renderAktivitas(){
+  if(answers.aktVer!==2){ answers.aktLog=null; answers.aktLog2=null; answers.aktStep=0; answers.aktStep2=0; answers.aktVer=2; }
   if(!answers.aktLog){ answers.aktLog=[{who:'bot',text:aktSteps1[0].bot}]; answers.aktStep=0; }
   if(!answers.aktLog2){ answers.aktLog2=[{who:'bot',text:aktSteps2[0].bot}]; answers.aktStep2=0; }
   saveAnswers();
@@ -1265,6 +1293,10 @@ function renderAktivitas(){
     html += `<div class="box"><p style="margin:0 0 4px;font-weight:800;font-size:15px;color:var(--blue-dark)">❓ Pertanyaan (Aktivitas 2)</p>
       <p style="margin:0;font-size:15px">Perhatikan pola susunan biji karet di atas. Ayo selidiki polanya langkah demi langkah bersama pemandu di bawah ini.</p></div>`;
   }
+  { const n=steps.length; const phase = done?4:Math.min(3,[0,1,2][stepN]===undefined?3:stepN+0); 
+    const labels=['💭 Tebak','🔍 Hitung','✅ Uji','📝 Simpulkan'];
+    const cur = done?4:stepN;
+    html += `<div class="inq-steps" aria-label="Tahapan inkuiri">`+labels.map((t,k)=>`<span class="inq-chip${k<cur?' done':''}${k===cur?' now':''}">${t}</span>`).join('')+`</div>`; }
   html += `<div class="note-help">💡 <b>Catatan:</b> Siswa yang kesulitan memahami pola bilangan, diperbolehkan menggunakan media seperti <b>lidi</b> ataupun <b>biji karet</b>.</div>`;
   html += `<p style="font-size:13px;color:var(--muted);text-align:center;margin:0 0 12px">Jawab lewat: ⌨ teks · 🎤 suara · 📷 foto coretan</p>`;
   html += `<button type="button" id="sfx-toggle" class="sfx-toggle${sfx.on?'':' off'}" aria-pressed="${sfx.on}">${sfx.on?'🔊 Suara maskot: hidup':'🔇 Suara maskot: mati'}</button>`;
@@ -1750,10 +1782,12 @@ function attachHandlers(i){
       mediaAttach['akt-input']={};
       const step = steps[stepN];
       if(v && step.check(v)){
+        if(stepN===0) answers[isAngka?'aktHip1':'aktHip2']=v;
+        if(stepN===steps.length-1) answers[isAngka?'aktKes1':'aktKes2']=v;
         log.push({who:'bot', kind:'ok', text:step.ok}); stepN++;
         let fin=null;
         if(stepN < steps.length){ log.push({who:'bot', kind:'bot', text:steps[stepN].bot}); }
-        else { if(isAngka) answers.aktivitas='Selesai Aktivitas 1 (pola angka, aturan +3).'; else answers.aktivitas2='Selesai Aktivitas 2 (pola biji karet, aturan +2).'; fin=()=>{ celebrate(); showToast('Hebat! Aktivitas selesai!'); }; }
+        else { if(isAngka) answers.aktivitas='Selesai Aktivitas 1 (pola angka, aturan +3). Tebakan: "'+(answers.aktHip1||'-')+'". Kesimpulan: "'+(answers.aktKes1||'-')+'".'; else answers.aktivitas2='Selesai Aktivitas 2 (pola biji karet, aturan +2). Tebakan: "'+(answers.aktHip2||'-')+'". Kesimpulan: "'+(answers.aktKes2||'-')+'".'; fin=()=>{ celebrate(); showToast('Hebat! Aktivitas selesai!'); }; }
         if(isAngka) answers.aktStep=stepN; else answers.aktStep2=stepN;
         aktAnim={from:before, finish:fin};
         saveAnswers(); renderBadges(); render(4);
@@ -1770,8 +1804,8 @@ function attachHandlers(i){
     });
     const rb=document.getElementById('akt-reset');
     if(rb) rb.addEventListener('click', ()=>{
-      if(isAngka){ answers.aktLog=null; answers.aktStep=0; delete answers.aktivitas; }
-      else { answers.aktLog2=null; answers.aktStep2=0; delete answers.aktivitas2; }
+      if(isAngka){ answers.aktLog=null; answers.aktStep=0; delete answers.aktivitas; delete answers.aktHip1; delete answers.aktKes1; }
+      else { answers.aktLog2=null; answers.aktStep2=0; delete answers.aktivitas2; delete answers.aktHip2; delete answers.aktKes2; }
       saveAnswers(); renderBadges(); render(4);
     });
     const sfxBtn=document.getElementById('sfx-toggle');
