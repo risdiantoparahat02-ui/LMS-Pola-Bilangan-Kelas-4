@@ -734,12 +734,13 @@ let aktMode = localStorage.getItem('lms_akt_mode') || 'angka';
 let asMode = localStorage.getItem('lms_as_mode') || 'tertulis';
 let localeDaerah = false;  /* Bahasa daerah dinonaktifkan — selalu Bahasa Indonesia */
 
+// Asesmen Tertulis — 5 soal, mencakup 4 tujuan: mengenali (pola gambar), melanjutkan, menemukan aturan, membuat pola
 const quiz = [
-  { q: "Lengkapi pola: 2, 4, 6, 8, __", options: ["9","10","12","16"], correct: 1, ket:"Bertambah 2, jadi 8 + 2 = 10." },
-  { q: "Lengkapi pola: 5, 10, 15, __", options: ["18","20","25","30"], correct: 1, ket:"Bertambah 5, jadi 15 + 5 = 20." },
-  { q: "3, 6, 9, 12 — apa aturan pola ini?", options: ["+2","+3","x2","-3"], correct: 1, ket:"Selisih antar angka selalu 3 (+3)." },
-  { q: "Lengkapi pola bilangan ganjil: 1, 3, 5, 7, __", options: ["8","9","10","11"], correct: 1, ket:"Bilangan ganjil bertambah 2, jadi 7 + 2 = 9." },
-  { q: "Lengkapi pola bilangan kuadrat: 1, 4, 9, 16, __", options: ["20","24","25","36"], correct: 2, ket:"1=1², 4=2², 9=3², 16=4², maka 5² = 25." }
+  { q: "<b>Pola gambar.</b> Perhatikan pola berikut:<br><span style='font-size:24px;line-height:1.8'>⭐ &nbsp;&nbsp; ⭐⭐⭐ &nbsp;&nbsp; ⭐⭐⭐⭐⭐ &nbsp;&nbsp; ❔</span><br>Berapa banyak bintang pada gambar ke-4?", options:["6","7","8","9"], correct:1, ket:"Banyak bintang 1, 3, 5, … bertambah 2 tiap gambar, jadi gambar ke-4 ada 7." },
+  { q: "<b>Melanjutkan barisan.</b> Lengkapi pola: 2, 4, 6, 8, __", options: ["9","10","12","16"], correct: 1, ket:"Bertambah 2, jadi 8 + 2 = 10." },
+  { q: "<b>Menemukan aturan.</b> 3, 6, 9, 12 — apa aturan pola ini?", options: ["+2","+3","x2","-3"], correct: 1, ket:"Selisih antar angka selalu 3 (+3)." },
+  { q: "<b>Melanjutkan barisan.</b> Lengkapi pola bilangan kuadrat: 1, 4, 9, 16, __", options: ["20","24","25","36"], correct: 2, ket:"1=1², 4=2², 9=3², 16=4², maka 5² = 25." },
+  { q: "<b>Membuat pola.</b> Kamu membuat pola loncat 3 mulai dari angka 4. Pola yang benar adalah …", options:["4, 7, 10, 13","4, 8, 12, 16","3, 6, 9, 12","4, 6, 8, 10"], correct:0, ket:"Mulai dari 4 lalu bertambah 3 terus: 4, 7, 10, 13." }
 ];
 
 /* ====== GATE ====== */
@@ -819,10 +820,22 @@ const screens = [
     note: "Baca langkah-langkah ini sebelum lanjut ke materi.",
     criteria: ["Instruksi tugas jelas — langkah singkat & bertahap", "Bahasa sederhana untuk kemampuan siswa yang beragam"],
     body: () => `
-      <h2>Petunjuk Belajar</h2>
-      <p class="desc">Instruksi tugas jelas — langkah singkat &amp; bertahap</p>
-      ${[["Siapkan diri","Sediakan buku, pensil, dan penghapus."],["Ikuti urutan","Materi → aktivitas → asesmen → refleksi."],["Amati polanya","Perhatikan selisih atau kelipatan antar angka."],["Coba sendiri dulu","Tebak aturannya sebelum melihat bantuan."],["Isi refleksi","Tuliskan pola yang mudah dan sulit bagimu."]].map((s,i)=>`
-        <div class="step"><span class="num">${i+1}</span><div><p class="t">${s[0]}</p><p class="d">${s[1]}</p></div></div>`).join('')}
+      <h2>🧭 Petunjuk Belajar</h2>
+      <p class="desc">Yuk, ikuti 5 langkah seru ini sebelum mulai! 🚀</p>
+      ${[
+        ["🎒","Siapkan diri","Sediakan buku, pensil, dan penghapus.","#1a73e8","#e8f0fe","#1557b0"],
+        ["🧭","Ikuti urutan","Materi → aktivitas → asesmen → refleksi.","#1e8e3e","#e6f4ea","#0f7b32"],
+        ["🔍","Amati polanya","Perhatikan selisih atau kelipatan antar angka.","#f9ab00","#fef7e0","#b06000"],
+        ["💡","Coba sendiri dulu","Tebak aturannya sebelum melihat bantuan.","#8e44ad","#f3e8fb","#6c3483"],
+        ["📝","Isi refleksi","Tuliskan pola yang mudah dan sulit bagimu.","#d93025","#fce8e6","#b31412"]
+      ].map((s,i)=>`
+        <div style="display:flex;align-items:center;gap:14px;background:${s[4]};border-left:6px solid ${s[3]};border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+          <div style="font-size:28px;width:50px;height:50px;flex:none;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.12)">${s[0]}</div>
+          <div style="flex:1;min-width:0">
+            <p style="margin:0;font-weight:800;font-size:16px;color:${s[5]};display:flex;align-items:center;gap:8px"><span style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;background:${s[3]};color:#fff;border-radius:50%;font-size:13px">${i+1}</span>${s[1]}</p>
+            <p style="margin:5px 0 0;font-size:14px;color:#5f6368">${s[2]}</p>
+          </div>
+        </div>`).join('')}
     `
   },
   {
@@ -833,8 +846,8 @@ const screens = [
       <h2>Tujuan Pembelajaran</h2>
       <p class="desc">Kompetensi yang akan diukur oleh asesmen</p>
       <div class="card-grid">
-        ${[["🔢","Mengenali pola","Mengenali pola bilangan (loncat, kelipatan, berulang)."],["➕","Menemukan aturan","Menemukan aturan penjumlahan/selisih pada barisan."],["🧮","Melanjutkan barisan","Menentukan bilangan berikutnya dari sebuah pola."],["✍️","Membuat pola","Menciptakan pola sendiri dan menjelaskan aturannya."]].map(g=>`
-          <div class="card"><div class="ico">${g[0]}</div><p class="t">${g[1]}</p><p class="d">${g[2]}</p></div>`).join('')}
+        ${[["🔢","Mengenali pola","Mengenali pola bilangan (loncat, kelipatan, berulang)."],["➕","Menemukan aturan","Menemukan aturan penjumlahan/selisih pada barisan."],["🧮","Melanjutkan barisan","Menentukan bilangan berikutnya dari sebuah pola."],["✍️","Membuat pola","Menciptakan pola sendiri dan menjelaskan aturannya."]].map(g=>{ const link=g[1]==='Membuat pola'; return `
+          <div class="card${link?' card-link':''}"${link?' data-goto="4" style="cursor:pointer;border:2px solid var(--amber,#f9ab00)"':''}><div class="ico">${g[0]}</div><p class="t">${g[1]}</p><p class="d">${g[2]}</p>${link?'<p class="d" style="color:#e8710a;font-weight:700;margin-top:6px">▶ Buka di menu Aktivitas</p>':''}</div>`; }).join('')}
       </div>
     `
   },
@@ -852,7 +865,7 @@ const screens = [
   },
   {
     title: "Asesmen", icon: "📝", url: "Asesmen",
-    note: "Jawab 5 soal. Skormu dihitung otomatis.",
+    note: "Pilih satu bentuk asesmen. Skormu dihitung otomatis.",
     criteria: ["Beragam bentuk asesmen (bukan esai 1.500 kata)", "Asesmen mengukur kompetensi yang dituju"],
     body: () => renderQuiz()
   },
@@ -1313,7 +1326,198 @@ function renderAktivitas(){
     html += `<button class="btn-2" id="akt-reset" style="margin-top:8px">↻ Ulangi aktivitas ini</button>`;
     if(isAngka && !answers.aktivitas2) html += `<p style="font-size:14px;margin-top:10px">Lanjut ke <b>Aktivitas 2 · Pola Gambar</b> di atas ya! 🖼️</p>`;
   }
+  html += membuatPolaHTML();
   return html;
+}
+
+/* ====== MEMBUAT POLA (2 pilihan: benda nyata+foto / games drag-drop) ====== */
+function membuatPolaHTML(){
+  const rule = escapeHtml(answers.mpRule||'');
+  const gameDone = !!answers.mpGame;
+  const photoSaved = (answers.lampiran||[]).some(a=>a.sumber==='membuat-pola');
+  const tab = answers.mpTab || 'benda';
+  return `
+  <div class="mp-card">
+    <h3 style="margin:0 0 4px">✍️ Membuat Pola Sendiri</h3>
+    <p style="font-size:13px;margin:0 0 10px;color:var(--muted)">Ciptakan polamu sendiri lalu jelaskan aturannya. Pilih salah satu cara:</p>
+    <div class="mp-tabs">
+      <button class="mp-tab ${tab==='benda'?'on':''}" data-mp="benda">🧵 Pakai benda nyata</button>
+      <button class="mp-tab ${tab==='games'?'on':''}" data-mp="games">🎮 Games: Susun Pola</button>
+    </div>
+    <div class="mp-pane" data-pane="benda" style="${tab==='benda'?'':'display:none'}">
+      <ol class="mp-steps">
+        <li>Susun <b>biji karet</b> atau <b>lidi</b> membentuk sebuah pola (contoh: 2, 4, 6, 8 …).</li>
+        <li>Foto hasil susunanmu dengan tombol 📷 Foto di bawah.</li>
+        <li>Tuliskan <b>aturan polamu</b> di kotak, lalu tekan Simpan.</li>
+      </ol>
+      ${modalityHTML('mp-foto')}
+      <textarea id="mp-rule" placeholder="Tuliskan aturan polamu… contoh: bertambah 2 setiap langkah.">${rule}</textarea>
+      <button class="btn-primary" id="mp-save" style="width:100%;margin-top:8px">💾 Simpan &amp; kumpulkan ke guru</button>
+      <p class="mp-status status-msg ${photoSaved?'ok':''}" id="mp-status">${photoSaved?'✓ Foto &amp; aturan polamu tersimpan. Akan ikut terkirim ke guru saat kamu mengirim hasil belajar di menu Refleksi.':''}</p>
+    </div>
+    <div class="mp-pane" data-pane="games" style="${tab==='games'?'':'display:none'}">
+      <p style="font-size:13px;margin:0 0 8px">Seret angka ke kotak untuk <b>membuat pola</b>. Buat barisan yang aturannya tetap (misalnya +2 atau +5), lalu tekan <b>Periksa</b>. Ketuk kotak untuk mengosongkannya.</p>
+      <div class="mp-palette" id="mp-palette">
+        ${[1,2,3,4,5,6,7,8,9,10,12,14,15,16,18,20,24,25,30].map(n=>`<div class="mp-tile" data-val="${n}">${n}</div>`).join('')}
+      </div>
+      <p style="font-size:12px;color:var(--muted);margin:8px 0 2px">Kotak polamu (seret angka ke sini):</p>
+      <div class="mp-slots" id="mp-slots">
+        ${[0,1,2,3,4].map(i=>`<div class="mp-slot" data-slot="${i}"></div>`).join('')}
+      </div>
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn-primary" id="mp-check" style="flex:1">✓ Periksa pola</button>
+        <button class="btn-2" id="mp-clear" style="flex:1">↻ Kosongkan</button>
+      </div>
+      <p class="mp-status status-msg ${gameDone?'ok':''}" id="mp-game-status">${gameDone?('✓ '+escapeHtml(answers.mpGame)):''}</p>
+    </div>
+  </div>`;
+}
+function injectMpStyle(){
+  if(document.getElementById('mp-style')) return;
+  const s=document.createElement('style'); s.id='mp-style';
+  s.textContent=`
+  .mp-card{border:2px solid var(--amber,#f9ab00);background:#fffdf5;border-radius:14px;padding:14px;margin-top:18px}
+  .mp-tabs{display:flex;gap:8px;margin:8px 0 12px;flex-wrap:wrap}
+  .mp-tab{flex:1;min-width:140px;border:1px solid var(--border,#dadce0);background:#fff;border-radius:10px;padding:10px;font-weight:700;font-size:14px;cursor:pointer}
+  .mp-tab.on{background:var(--amber,#f9ab00);color:#fff;border-color:var(--amber,#f9ab00)}
+  .mp-steps{font-size:13px;margin:6px 0 10px;padding-left:20px}
+  .mp-steps li{margin-bottom:4px}
+  #mp-rule{width:100%;min-height:64px;border:1px solid var(--border,#dadce0);border-radius:10px;padding:10px;font-size:14px;box-sizing:border-box;font-family:inherit}
+  .mp-status{margin-top:8px;font-size:13px}
+  .mp-palette{display:flex;flex-wrap:wrap;gap:8px;padding:8px;background:#fff;border:1px dashed var(--border,#dadce0);border-radius:10px}
+  .mp-tile{width:44px;height:44px;border-radius:10px;background:var(--blue,#1a73e8);color:#fff;font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab;user-select:none;box-shadow:0 2px 4px rgba(0,0,0,.15)}
+  .mp-ghost{width:44px;height:44px;border-radius:10px;background:var(--blue,#1a73e8);color:#fff;font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center}
+  .mp-slots{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .mp-slot{width:48px;height:48px;border-radius:10px;border:2px dashed #bbb;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:var(--blue-dark,#1557b0);cursor:pointer}
+  .mp-slot.filled{border-style:solid;border-color:var(--green,#1e8e3e);background:#e6f4ea}
+  .mp-slot.over{border-color:var(--amber,#f9ab00);background:#fff7e0}
+  `;
+  document.head.appendChild(s);
+}
+function wireMembuatPola(){
+  injectMpStyle();
+  document.querySelectorAll('.mp-tab').forEach(t=>t.addEventListener('click',()=>{
+    answers.mpTab=t.dataset.mp; saveAnswers();
+    document.querySelectorAll('.mp-tab').forEach(x=>x.classList.toggle('on',x===t));
+    document.querySelectorAll('.mp-pane').forEach(p=>p.style.display=(p.dataset.pane===t.dataset.mp)?'':'none');
+    if(t.dataset.mp==='games') initMpGame();
+  }));
+  attachModality('mp-foto');
+  const rule=document.getElementById('mp-rule');
+  if(rule) rule.addEventListener('input',()=>{ answers.mpRule=rule.value; saveAnswers(); });
+  const save=document.getElementById('mp-save');
+  if(save) save.addEventListener('click',()=>{
+    const a=mediaAttach['mp-foto']||{};
+    const r=(document.getElementById('mp-rule')||{}).value||'';
+    answers.mpRule=r.trim(); saveAnswers();
+    const st=document.getElementById('mp-status');
+    if(!a.photo && !answers.mpRule){ if(st){ st.textContent='Ambil foto susunanmu atau tulis aturannya dulu ya.'; st.className='mp-status status-msg'; } return; }
+    if(a.photo){ pushLampiran('foto','membuat-pola',a.photo); mediaAttach['mp-foto']={}; renderAttachPreview('mp-foto'); }
+    answers.mpDone=true; saveAnswers(); renderBadges();
+    if(st){ st.textContent='✓ Foto & aturan polamu tersimpan. Akan ikut terkirim ke guru saat kamu mengirim hasil belajar di menu Refleksi.'; st.className='mp-status status-msg ok'; }
+    showToast('Tersimpan ✓ akan dikumpulkan ke guru.'); celebrate();
+  });
+  if((answers.mpTab||'benda')==='games') initMpGame();
+}
+function initMpGame(){
+  const palette=document.getElementById('mp-palette');
+  const slots=document.getElementById('mp-slots');
+  if(!palette||!slots||palette.dataset.wired) return;
+  palette.dataset.wired='1';
+  const saved=answers.mpSlots||[];
+  const slotEls=[...slots.querySelectorAll('.mp-slot')];
+  slotEls.forEach((s,i)=>{ if(saved[i]!=null && saved[i]!==''){ s.textContent=saved[i]; s.classList.add('filled'); } });
+  function saveSlots(){ answers.mpSlots=slotEls.map(s=>s.classList.contains('filled')?parseInt(s.textContent):''); saveAnswers(); }
+  slotEls.forEach(s=>s.addEventListener('click',()=>{ if(s.classList.contains('filled')){ s.textContent=''; s.classList.remove('filled'); saveSlots(); } }));
+  let drag=null;
+  function moveGhost(e){ if(drag){ drag.clone.style.left=(e.clientX-22)+'px'; drag.clone.style.top=(e.clientY-22)+'px'; } }
+  function highlight(e){ const el=document.elementFromPoint(e.clientX,e.clientY); const sl=el&&el.closest?el.closest('.mp-slot'):null; slotEls.forEach(s=>s.classList.toggle('over',s===sl)); }
+  function cleanup(){ if(drag&&drag.clone)drag.clone.remove(); drag=null; slotEls.forEach(s=>s.classList.remove('over')); }
+  palette.querySelectorAll('.mp-tile').forEach(tile=>{
+    tile.addEventListener('pointerdown',e=>{
+      e.preventDefault();
+      const clone=tile.cloneNode(true); clone.className='mp-ghost';
+      clone.style.position='fixed'; clone.style.zIndex='9999'; clone.style.pointerEvents='none'; clone.style.opacity='.92';
+      document.body.appendChild(clone);
+      drag={val:tile.dataset.val, clone}; moveGhost(e);
+      try{ tile.setPointerCapture(e.pointerId); }catch(_){}
+    });
+    tile.addEventListener('pointermove',e=>{ if(drag){ moveGhost(e); highlight(e); } });
+    tile.addEventListener('pointerup',e=>{
+      if(!drag) return;
+      const el=document.elementFromPoint(e.clientX,e.clientY);
+      const slot=el&&el.closest?el.closest('.mp-slot'):null;
+      if(slot){ slot.textContent=drag.val; slot.classList.add('filled'); saveSlots(); }
+      cleanup();
+    });
+    tile.addEventListener('pointercancel',cleanup);
+  });
+  const check=document.getElementById('mp-check');
+  if(check) check.addEventListener('click',()=>mpCheck(slotEls));
+  const clear=document.getElementById('mp-clear');
+  if(clear) clear.addEventListener('click',()=>{
+    slotEls.forEach(s=>{ s.textContent=''; s.classList.remove('filled'); });
+    answers.mpSlots=[]; delete answers.mpGame; delete answers.mpGameImg;
+    answers.lampiran=(answers.lampiran||[]).filter(x=>x.tag!=='mp-game'); saveAnswers();
+    const st=document.getElementById('mp-game-status'); if(st){ st.textContent=''; st.className='mp-status status-msg'; }
+  });
+}
+function mpRoundRect(g,x,y,w,h,r){ g.beginPath(); g.moveTo(x+r,y); g.arcTo(x+w,y,x+w,y+h,r); g.arcTo(x+w,y+h,x,y+h,r); g.arcTo(x,y+h,x,y,r); g.arcTo(x,y,x+w,y,r); g.closePath(); }
+function mpGameSnapshot(filled, caption){
+  const n=filled.length, tile=56, gap=12, padX=20, padTop=66, padBot=28;
+  const W=Math.max(320, padX*2 + n*tile + (n-1)*gap), H=padTop+tile+padBot;
+  const c=document.createElement('canvas'); c.width=W*2; c.height=H*2;
+  const g=c.getContext('2d'); g.scale(2,2);
+  g.fillStyle='#ffffff'; g.fillRect(0,0,W,H);
+  g.fillStyle='#1557b0'; g.font='bold 18px "Segoe UI",Arial'; g.textBaseline='top';
+  g.fillText('✍️ Pola buatan siswa', padX, 14);
+  g.fillStyle='#5f6368'; g.font='13px "Segoe UI",Arial';
+  g.fillText(caption||'Pola bilangan', padX, 40);
+  let x=padX;
+  filled.forEach(v=>{
+    g.fillStyle='#1a73e8'; mpRoundRect(g,x,padTop,tile,tile,12); g.fill();
+    g.fillStyle='#ffffff'; g.font='bold 24px "Segoe UI",Arial'; g.textAlign='center'; g.textBaseline='middle';
+    g.fillText(String(v), x+tile/2, padTop+tile/2+1);
+    g.textAlign='left'; g.textBaseline='top'; x+=tile+gap;
+  });
+  g.fillStyle='#9aa0a6'; g.font='12px "Segoe UI",Arial';
+  g.fillText(((typeof studentName!=='undefined'&&studentName)?studentName+'  ·  ':'')+'Games: Susun Pola', padX, padTop+tile+8);
+  return c.toDataURL('image/png');
+}
+function mpAttachSnapshot(filled, caption){
+  try{
+    const img=mpGameSnapshot(filled, caption);
+    answers.lampiran=(answers.lampiran||[]).filter(x=>x.tag!=='mp-game');
+    answers.lampiran.push({ jenis:'foto', sumber:'membuat-pola', data:img, tag:'mp-game' });
+    answers.mpGameImg=img; saveAnswers();
+  }catch(e){}
+}
+function mpCheck(slotEls){
+  const st=document.getElementById('mp-game-status');
+  const setS=(m,ok)=>{ if(st){ st.textContent=m; st.className='mp-status status-msg '+(ok?'ok':''); } };
+  const vals=slotEls.map(s=>s.classList.contains('filled')?parseInt(s.textContent):null);
+  const firstGap=vals.indexOf(null);
+  const filled=(firstGap===-1?vals:vals.slice(0,firstGap));
+  const contiguous=firstGap===-1 || vals.slice(firstGap).every(v=>v==null);
+  if(filled.length<3 || !contiguous){ setS('Isi minimal 3 kotak berurutan dari kiri dulu ya.',false); return; }
+  const diffs=[]; for(let i=1;i<filled.length;i++) diffs.push(filled[i]-filled[i-1]);
+  if(diffs.every(d=>d===diffs[0]) && diffs[0]!==0){
+    const d=diffs[0], arah=d>0?('+'+d):(''+d);
+    const msg='Kamu membuat pola '+filled.join(', ')+' dengan aturan '+arah+' setiap langkah.';
+    answers.mpGame=msg; answers.mpDone=true;
+    mpAttachSnapshot(filled, 'Aturan: '+arah+' setiap langkah');
+    renderBadges();
+    setS('✓ Hebat! '+msg+' Gambar polamu tersimpan untuk guru.',true); celebrate(); showToast('Pola berhasil dibuat! 🎉'); return;
+  }
+  // deteksi pola berulang sederhana (periode 2), mis. 2,4,2,4
+  if(filled.length>=4 && filled[0]===filled[2] && filled[1]===filled[3] && filled[0]!==filled[1]){
+    const msg='Kamu membuat pola berulang '+filled.join(', ')+' (mengulang '+filled[0]+', '+filled[1]+').';
+    answers.mpGame=msg; answers.mpDone=true;
+    mpAttachSnapshot(filled, 'Pola berulang '+filled[0]+', '+filled[1]);
+    renderBadges();
+    setS('✓ Hebat! '+msg+' Gambar polamu tersimpan untuk guru.',true); celebrate(); showToast('Pola berulang berhasil! 🎉'); return;
+  }
+  setS('Hampir! Coba buat selisih yang tetap, misalnya 2, 4, 6, 8 (selalu +2).',false);
 }
 
 /* ====== ASESMEN ======
@@ -1324,29 +1528,31 @@ function renderAktivitas(){
    (5) pola bilangan kuadrat. Hanya BENTUK penyajian yang berbeda. */
 
 // Butir asesmen bersama — dipakai bentuk Lisan & Foto agar setara dengan Tertulis
+// Lisan & Foto — 5 soal, mencakup 4 tujuan: mengenali (pola gambar), melanjutkan, menemukan aturan, membuat pola
 const asesmenItems = [
+  {barisan:'🔵  |  🔵🔵  |  🔵🔵🔵  |  …   (pola gambar)', tanya:'Lanjutkan pola gambar ini: berapa banyak bulatan pada gambar ke-4, dan apa aturannya?'},
   {barisan:'2, 4, 6, 8, …',  tanya:'Berapa bilangan berikutnya, dan apa aturannya?'},
-  {barisan:'5, 10, 15, …',   tanya:'Berapa bilangan berikutnya, dan apa aturannya?'},
   {barisan:'3, 6, 9, 12',    tanya:'Apa aturan pola ini?'},
-  {barisan:'1, 3, 5, 7, …  (pola bilangan ganjil)', tanya:'Berapa bilangan berikutnya?'},
-  {barisan:'1, 4, 9, 16, …  (pola bilangan kuadrat)', tanya:'Berapa bilangan berikutnya?'}
+  {barisan:'1, 4, 9, 16, …  (pola bilangan kuadrat)', tanya:'Berapa bilangan berikutnya?'},
+  {barisan:'Pola buatanmu sendiri', tanya:'Buatlah satu pola bilanganmu sendiri (boleh memakai benda, lidi, atau biji), lalu jelaskan aturannya.'}
 ];
 
 // Menjodohkan — setara: mencakup bertambah, menemukan aturan, berkurang, kuadrat
+// Menjodohkan — 5 pasang, mencakup pola gambar (+1), bertambah, membuat pola (loncat 4), berkurang, kuadrat
 const jodohSoal = [
+  {barisan:'🟢 | 🟢🟢 | 🟢🟢🟢 | 🟢🟢🟢🟢', aturan:'+1'},
   {barisan:'2, 4, 6, 8', aturan:'+2'},
-  {barisan:'5, 10, 15, 20', aturan:'+5'},
-  {barisan:'3, 6, 9, 12', aturan:'+3'},
+  {barisan:'4, 8, 12, 16', aturan:'+4'},
   {barisan:'30, 27, 24, 21', aturan:'−3'},
   {barisan:'1, 4, 9, 16', aturan:'kuadrat (n²)'}
 ];
-const jodohOptions = ['+2','+3','+5','−3','kuadrat (n²)'];
+const jodohOptions = ['+1','+2','+4','−3','kuadrat (n²)'];
 
 function terkirimNote(){
   return `<div class="terkirim-note">✅ <b>Jawaban sudah terkirim.</b> Jawaban asesmen bersifat final dan tidak dapat diperbaiki atau diulang lagi.</div>`;
 }
 function renderQuiz(){
-  let html = `<h2>Asesmen</h2><p class="desc">Pilih bentuk asesmen yang ingin kamu kerjakan — <b>tingkat kesukaran soalnya sama</b>, hanya caranya yang berbeda</p>`;
+  let html = `<h2>Asesmen</h2><p class="desc">Pilih bentuk asesmen yang ingin kamu kerjakan — <b>tingkat kesukaran soalnya sama</b>, hanya caranya yang berbeda. Semua menguji 4 tujuan: mengenali pola, menemukan aturan, melanjutkan barisan, dan <b>membuat pola</b> (termasuk pola gambar).</p>`;
   html += `<div class="mode-chips">
     <button class="mode-chip ${asMode==='tertulis'?'on':''}" data-as="tertulis">📝 Tertulis</button>
     <button class="mode-chip ${asMode==='jodoh'?'on':''}" data-as="jodoh">🧩 Menjodohkan</button>
@@ -1420,7 +1626,7 @@ function renderQuizLisan(){
       ${terkirimNote()}
       <p class="status-msg ok" style="margin-top:6px">Jawaban lisanmu akan didengarkan gurumu.</p>`;
   }
-  let html = `<div class="box" style="font-size:15px">🎤 <b>Asesmen lisan.</b> Jawab kelima soal ini dengan suaramu (tekan <b>🎤 Rekam</b>). Soalnya sama tingkatnya dengan asesmen tertulis:</div>`;
+  let html = `<div class="box" style="font-size:15px">🎤 <b>Asesmen lisan.</b> Jawab soal-soal ini dengan suaramu (tekan <b>🎤 Rekam</b>). Soalnya menguji tujuan yang sama: mengenali pola, menemukan aturan, melanjutkan barisan, dan membuat pola:</div>`;
   html += `<ol style="font-size:15px;padding-left:22px;margin:8px 0 4px">`;
   asesmenItems.forEach(it=>{ html += `<li style="margin-bottom:8px"><b>${it.barisan}</b> — ${it.tanya}</li>`; });
   html += `</ol>`;
@@ -1435,7 +1641,7 @@ function renderQuizFoto(){
       ${terkirimNote()}
       <p class="status-msg ok" style="margin-top:6px">Fotomu akan diperiksa gurumu.</p>`;
   }
-  let html = `<div class="box" style="font-size:15px">📷 <b>Asesmen foto.</b> Kerjakan kelima soal ini di buku/kertas (tulis jawaban & aturannya, boleh pakai <b>lidi/biji karet</b>), lalu <b>foto dan unggah</b>. Soalnya sama tingkatnya dengan asesmen tertulis:</div>`;
+  let html = `<div class="box" style="font-size:15px">📷 <b>Asesmen foto.</b> Kerjakan soal-soal ini di buku/kertas (tulis jawaban & aturannya, boleh pakai <b>lidi/biji karet</b>), lalu <b>foto dan unggah</b>. Soalnya menguji tujuan yang sama: mengenali pola, menemukan aturan, melanjutkan barisan, dan membuat pola:</div>`;
   html += `<ol style="font-size:15px;padding-left:22px;margin:8px 0 4px">`;
   asesmenItems.forEach(it=>{ html += `<li style="margin-bottom:8px"><b>${it.barisan}</b> — ${it.tanya}</li>`; });
   html += `</ol>`;
@@ -1808,6 +2014,7 @@ function attachHandlers(i){
       else { answers.aktLog2=null; answers.aktStep2=0; delete answers.aktivitas2; delete answers.aktHip2; delete answers.aktKes2; }
       saveAnswers(); renderBadges(); render(4);
     });
+    wireMembuatPola();
     const sfxBtn=document.getElementById('sfx-toggle');
     if(sfxBtn) sfxBtn.addEventListener('click', ()=>{
       sfx.setOn(!sfx.on);
@@ -1854,6 +2061,9 @@ function attachHandlers(i){
         next();
       }
     }
+  }
+  if(i===2){
+    document.querySelectorAll('.card-grid .card-link[data-goto]').forEach(c=>c.addEventListener('click',()=>{ answers.mpTab=answers.mpTab||'benda'; saveAnswers(); render(parseInt(c.dataset.goto)); }));
   }
   if(i===5){
     document.querySelectorAll('[data-as]').forEach(ch=>ch.addEventListener('click',()=>{ asMode=ch.dataset.as; localStorage.setItem('lms_as_mode',asMode); render(5); }));
@@ -1938,7 +2148,7 @@ async function exportResult(){
   document.querySelectorAll('.refleksi-input').forEach(tx=>{ answers.refleksi[parseInt(tx.dataset.idx)] = tx.value; });
   const lamp = answers.lampiran || [];
   // Kelompokkan lampiran berdasarkan menu (sumber): aktivitas, refleksi, asesmen
-  const menuLabel = { aktivitas1:'Aktivitas', aktivitas2:'Aktivitas', aktivitas:'Aktivitas', refleksi:'Refleksi', 'asesmen-foto':'Asesmen', 'asesmen-lisan':'Asesmen', asesmen:'Asesmen' };
+  const menuLabel = { aktivitas1:'Aktivitas', aktivitas2:'Aktivitas', aktivitas:'Aktivitas', 'membuat-pola':'Membuat Pola', refleksi:'Refleksi', 'asesmen-foto':'Asesmen', 'asesmen-lisan':'Asesmen', asesmen:'Asesmen' };
   const groups = {};
   lamp.forEach(a=>{ const key = menuLabel[a.sumber] || (a.sumber ? a.sumber.charAt(0).toUpperCase()+a.sumber.slice(1) : 'Lainnya'); (groups[key]=groups[key]||[]).push(a); });
   let lampiranHTML = '';
@@ -1976,6 +2186,7 @@ async function exportResult(){
   <h2>Ringkasan</h2>
   <p class="kv"><b>Skor asesmen:</b> ${answers.score ?? '-'} / 100</p>
   <p class="kv"><b>Jawaban aktivitas:</b></p><div class="box">${escapeHtml(answers.aktivitas || '-')}</div>
+  <p class="kv"><b>Membuat pola:</b></p><div class="box">${escapeHtml([(answers.mpRule?('Aturan: '+answers.mpRule):''),(answers.mpGame?('Games: '+answers.mpGame):'')].filter(Boolean).join('  |  ') || '-')}</div>
   <h2>Refleksi</h2>
   <p class="kv"><b>1. Pola apa yang paling mudah kamu pahami?</b></p><div class="box">${escapeHtml(answers.refleksi[0] || '-')}</div>
   <p class="kv"><b>2. Bagian mana yang masih membingungkan?</b></p><div class="box">${escapeHtml(answers.refleksi[1] || '-')}</div>
@@ -2032,6 +2243,7 @@ async function submitFinal(){
   const payload = {
     nama: studentName, waktu: new Date().toISOString(),
     jawabanAktivitas: answers.aktivitas || '',
+    jawabanMembuatPola: [(answers.mpRule?('Aturan: '+answers.mpRule):''), (answers.mpGame?('Games: '+answers.mpGame):'')].filter(Boolean).join(' | '),
     skorAsesmen: answers.score ?? '',
     refleksi1: answers.refleksi[0] || '', refleksi2: answers.refleksi[1] || '', refleksi3: answers.refleksi[2] || '',
     lampiran: (answers.lampiran || []).slice(-12)
