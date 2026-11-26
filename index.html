@@ -659,11 +659,11 @@
         <div class="crumb" id="url-bar"></div>
         <div class="card content-card">
           <div class="card-toolbar">
-            <button id="a-minus" aria-label="Perkecil ukuran teks">A−</button>
-            <button id="a-plus" aria-label="Perbesar ukuran teks">A+</button>
-            <button id="tts-btn">🔊 Bacakan</button>
-            <button id="data-saver-btn">📶 Hemat data</button>
-            <button id="download-btn">⬇ Unduh materi</button>
+            <button id="a-minus" aria-label="Perkecil ukuran teks" title="Perkecil ukuran tulisan">A−</button>
+            <button id="a-plus" aria-label="Perbesar ukuran teks" title="Perbesar ukuran tulisan">A+</button>
+            <button id="tts-btn" title="Bacakan materi dengan suara">🔊 Bacakan</button>
+            <button id="data-saver-btn" title="Hemat kuota internet (sembunyikan gambar/video berat)">📶 Hemat data</button>
+            <button id="download-btn" title="Unduh atau cetak materi/modul">⬇ Unduh materi</button>
           </div>
           <div id="mascot"><div class="robot">💡</div><div class="bubble" id="mascot-text"></div></div>
           <div class="screen-body" id="screen-body"></div>
@@ -836,6 +836,24 @@ const screens = [
             <p style="margin:5px 0 0;font-size:14px;color:#5f6368">${s[2]}</p>
           </div>
         </div>`).join('')}
+      <div style="margin-top:18px;border:2px solid #f9ab00;background:#fffdf5;border-radius:16px;padding:14px 16px">
+        <h3 style="margin:0 0 3px;color:#b06000;font-size:17px">🔎 Kenali Tombol di Aplikasi</h3>
+        <p style="margin:0 0 12px;font-size:13px;color:#5f6368">Tombol-tombol ini membantumu belajar. Yuk, kenali fungsinya dulu!</p>
+        ${[
+          ["A+","Memperbesar tulisan kalau terasa terlalu kecil."],
+          ["A−","Memperkecil tulisan kalau terasa terlalu besar."],
+          ["🔊 Bacakan","Membacakan materi dengan suara — dengarkan sambil membaca."],
+          ["📶 Hemat data","Menghemat kuota internet (menyembunyikan gambar/video berat)."],
+          ["⬇ Unduh materi","Menyimpan materi/modul untuk dibaca luring atau dicetak."],
+          ["⬅ ➡","Tombol <b>Menu sebelumnya</b> / <b>berikutnya</b> untuk berpindah bagian."],
+          ["📷 🎤","Mengunggah foto jawaban atau merekam suara (di Aktivitas &amp; Asesmen)."]
+        ].map(r=>`
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:9px">
+            <span style="flex:none;min-width:62px;text-align:center;font-weight:800;font-size:14px;color:#fff;background:linear-gradient(180deg,#ffa726,#fb8c00);border-radius:10px;padding:9px 10px;box-shadow:0 2px 4px rgba(232,113,10,.25)">${r[0]}</span>
+            <span style="font-size:14px;color:#3c4043;line-height:1.5">${r[1]}</span>
+          </div>`).join('')}
+        <p style="margin:8px 0 0;font-size:12.5px;color:#7a5200">💡 Kamu juga bisa menekan lama sebuah tombol untuk melihat keterangannya.</p>
+      </div>
     `
   },
   {
@@ -2128,19 +2146,93 @@ function attachHandlers(i){
 
 /* ====== UNDUH MATERI (HTML ramah screen reader, bisa dicetak PDF) ====== */
 function downloadMateri(){
-  const body = materiSlides.map((s,i)=>`<h2>${i+1}. ${escapeHtml(s.title)}</h2>\n${s.body()}`).join('\n');
-  const doc = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Materi Pola Bilangan</title>
-  <style>body{font-family:Arial,sans-serif;max-width:720px;margin:24px auto;padding:0 16px;line-height:1.6;color:#202124}h1{font-size:22px}h2{font-size:17px;margin-top:22px;color:#1557b0}ul{padding-left:20px}</style>
-  </head><body><h1>Materi Pola Bilangan — Matematika SD</h1>
-  <p>Unit 5: Menemukan Pola Bilangan. Materi ini dapat dibaca luring dan dicetak menjadi PDF (Ctrl+P → Simpan sebagai PDF).</p>
-  ${body}
-  <hr><p style="font-size:12px;color:#5f6368">LMS Pola Bilangan · Kelompok 6, Magister Teknologi Pendidikan FKIP Untan</p>
+  // Materi (tanpa slide latihan interaktif) — dibuat rapi untuk cetak
+  let no=0;
+  const materiHTML = materiSlides
+    .filter(s=> s.title!=='Latihan untuk siswa')
+    .map(s=>{ no++; return `<div class="blok"><h3>${no}. ${escapeHtml(s.title)}</h3>${s.body()}</div>`; })
+    .join('\n');
+  // Latihan tertulis (5 soal) tanpa kunci jawaban
+  const soalHTML = quiz.map((q,i)=>`<div class="soal"><p class="qno">${i+1}. ${q.q}</p>`
+      + `<ol class="opts" type="a">${q.options.map(o=>`<li>${escapeHtml(o)}</li>`).join('')}</ol>`
+      + `<p class="jawab">Jawaban: ( &nbsp; ___ &nbsp; )</p></div>`).join('');
+  const doc = `<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Modul Pembelajaran Pola Bilangan</title>
+  <style>
+  :root{--blue:#1a73e8;--blue-dark:#1557b0;--green-text:#1e8e3e;--amber:#f9ab00;--muted:#5f6368}
+  *{box-sizing:border-box}
+  body{font-family:Arial,Helvetica,sans-serif;max-width:760px;margin:0 auto;padding:16px;line-height:1.6;color:#202124}
+  h1{font-size:22px;color:var(--blue-dark);margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 12px}
+  .idbar{border:1px solid #bbb;border-radius:8px;padding:9px 12px;font-size:13px;margin:0 0 16px}
+  h2{font-size:16px;color:#fff;background:var(--blue);border-radius:8px;padding:7px 12px;margin:18px 0 8px}
+  h3{font-size:14px;color:var(--blue-dark);margin:14px 0 4px}
+  ul{padding-left:20px;margin:6px 0}
+  .blok,.soal{page-break-inside:avoid}
+  .sect{page-break-before:always}
+  .note-help{background:#fff8e1;border:1px solid #fde293;border-left:5px solid var(--amber);border-radius:10px;padding:10px 14px;font-size:13px;color:#7a5200;margin:8px 0}
+  .pengayaan-tag{display:inline-block;background:#fef7e0;color:#8a5a00;border:1px solid #fde293;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:800;margin:0 0 6px}
+  .soal{margin:0 0 12px}
+  .qno{font-weight:700;font-size:14px;margin:0 0 4px}
+  .opts{margin:2px 0 4px;padding-left:22px;font-size:13px}
+  .opts li{margin:2px 0}
+  .jawab{font-size:13px;color:#333;margin:4px 0 0}
+  .kotak{border:1.5px dashed #999;border-radius:10px;height:120px;margin:6px 0}
+  .garis{display:inline-block;border-bottom:1px dotted #777;height:18px;min-width:60%}
+  .toolbar{position:sticky;top:0;background:var(--blue);color:#fff;padding:10px;text-align:center;border-radius:8px;margin:0 0 16px}
+  .toolbar button{background:#fff;color:var(--blue);border:0;border-radius:8px;padding:8px 18px;font-weight:700;cursor:pointer;font-size:14px}
+  @media print{.toolbar{display:none}}
+  @page{size:A4;margin:1.6cm}
+  </style></head><body>
+  <div class="toolbar"><button onclick="window.print()">🖨️ Cetak / Simpan sebagai PDF</button></div>
+  <h1>📘 Modul Pembelajaran — Pola Bilangan</h1>
+  <p class="sub">Matematika Kelas IV SD · Unit: Menemukan Pola Bilangan · Dapat dibaca luring &amp; dicetak (Ctrl/Cmd + P → Simpan sebagai PDF)</p>
+  <div class="idbar">Nama: ____________________&nbsp;&nbsp;&nbsp;Kelas: IV ____&nbsp;&nbsp;&nbsp;No. Absen: ____&nbsp;&nbsp;&nbsp;Hari/Tanggal: ______________</div>
+
+  <h2>A. Tujuan Pembelajaran</h2>
+  <p style="font-size:13px;margin:0 0 4px">Setelah mempelajari modul ini, siswa diharapkan mampu:</p>
+  <ul style="font-size:13px">
+    <li>mengenali pola bilangan (loncat, kelipatan, dan berulang);</li>
+    <li>menemukan aturan penjumlahan atau selisih pada suatu barisan;</li>
+    <li>melanjutkan barisan dengan menentukan bilangan berikutnya;</li>
+    <li>membuat pola bilangan sendiri dan menjelaskan aturannya.</li>
+  </ul>
+
+  <h2>B. Petunjuk Belajar</h2>
+  <ul style="font-size:13px">
+    <li>Siapkan buku, pensil, dan penghapus.</li>
+    <li>Ikuti urutan: materi → aktivitas → latihan.</li>
+    <li>Amati selisih atau kelipatan antar angka.</li>
+    <li>Cobalah menebak aturannya sendiri sebelum melihat jawaban.</li>
+  </ul>
+
+  <h2>C. Materi</h2>
+  ${materiHTML}
+
+  <h2 class="sect">D. Aktivitas: Membuat Pola Sendiri</h2>
+  <p style="font-size:13px;margin:0 0 6px">Pilih salah satu cara berikut, lalu kerjakan.</p>
+  <h3>Pilihan 1 — Pakai benda nyata (biji karet / lidi / stik)</h3>
+  <p style="font-size:13px;margin:0 0 4px">Susunlah benda membentuk sebuah pola (contoh: 2, 4, 6, 8). Gambar atau tempelkan hasil susunanmu pada kotak di bawah, lalu tuliskan aturannya.</p>
+  <div class="kotak"></div>
+  <p style="font-size:13px">Aturan polaku: <span class="garis"></span></p>
+  <h3>Pilihan 2 — Buat pola bilangan sendiri</h3>
+  <p style="font-size:13px;margin:0 0 4px">Tuliskan 5 bilangan yang membentuk sebuah pola, lalu jelaskan aturannya.</p>
+  <p style="font-size:14px;letter-spacing:2px">Pola: ____ &nbsp; , &nbsp; ____ &nbsp; , &nbsp; ____ &nbsp; , &nbsp; ____ &nbsp; , &nbsp; ____</p>
+  <p style="font-size:13px">Aturan: <span class="garis"></span></p>
+
+  <h2 class="sect">E. Latihan Soal</h2>
+  <p style="font-size:13px;margin:0 0 8px">Kerjakan soal berikut. Tulis huruf jawaban yang benar pada tempat yang tersedia.</p>
+  ${soalHTML}
+  <div class="soal"><p class="qno">6. Membuat pola. Buatlah satu pola bilanganmu sendiri, lalu jelaskan aturannya.</p>
+  <p style="font-size:14px;letter-spacing:2px">Pola: ____ &nbsp; , &nbsp; ____ &nbsp; , &nbsp; ____ &nbsp; , &nbsp; ____</p>
+  <p style="font-size:13px">Aturan: <span class="garis"></span></p></div>
+
+  <hr style="margin-top:20px"><p class="sub">LMS Pola Bilangan · Modul cetak untuk pembelajaran luring.</p>
   </body></html>`;
   const blob = new Blob([doc], {type:'text/html;charset=utf-8'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='Materi_Pola_Bilangan.html';
+  const a = document.createElement('a'); a.href=url; a.download='Modul_Pola_Bilangan.html';
   document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-  showToast('Materi diunduh (bisa dibuka luring).');
+  showToast('Modul pembelajaran diunduh (bisa dicetak / Simpan PDF).');
 }
 
 async function exportResult(){
@@ -2328,8 +2420,7 @@ function showUnduhMenu(){
   let items = '';
   if(pdf) items += `<a class="unduh-btn pdf" href="${pdf}" target="_blank" rel="noopener" data-close>📄 Materi PDF</a>`;
   if(vid) items += `<a class="unduh-btn vid" href="${vid}" target="_blank" rel="noopener" data-close>🎬 Video</a>`;
-  if(!pdf && !vid) items = `<p style="font-size:13px;color:var(--muted)">Belum ada berkas untuk diunduh.</p>
-      <button class="unduh-btn pdf" id="um-html" data-close>⬇ Simpan materi luring (HTML)</button>`;
+  items += `<button class="unduh-btn pdf" id="um-html" data-close>📘 Modul cetak (HTML / PDF)</button>`;
   ov.innerHTML = `<div class="unduh-sheet">
       <p class="um-title">⬇ Unduh Materi</p>
       <p class="um-sub">Pilih yang ingin diunduh:</p>

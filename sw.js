@@ -1,5 +1,5 @@
 /* Service Worker — LMS Pola Bilangan (installable + offline) */
-const CACHE = 'pola-bilangan-pwa-v1';
+const CACHE = 'pola-bilangan-pwa-v3';
 const CORE = ['./','./index.html','./manifest.json','./icon-192.png','./icon-512.png','./icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
